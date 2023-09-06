@@ -1,0 +1,29 @@
+{
+    "name": "partygames/game-api",
+    "authors": [
+        {
+            "name": "Kaspars Vanags",
+            "email": "slaviktheforeigner@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "PartyGames\\GameApi\\" : "src/"
+        },
+        "files": ["src/helpers.php"]
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.10"
+    },
+    "extra": {
+        "laravel" : {
+            "providers": [
+                "PartyGames\\GameApi\\GameApiServiceProvider",
+                "PartyGames\\GameApi\\RouteServiceProvider"
+            ],
+            "aliases": {
+                "GameApi": "PartyGames\\GameApi\\Facades\\GameApi"
+            }
+        }
+    }
+}
