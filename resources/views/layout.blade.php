@@ -21,8 +21,8 @@
 
     </head>
     <body>
-        @include('partials.nav')
+        @include('game-api::partials.nav')
         @yield('body')
-        @include('partials.footer')
+        @include('game-api::partials.footer')
     </body>
 </html>
