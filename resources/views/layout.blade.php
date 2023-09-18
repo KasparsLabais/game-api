@@ -20,9 +20,15 @@
         <script src="{{ asset('js/app.js') }}" defer></script>
 
     </head>
-    <body>
-        @include('game-api::partials.nav')
-        @yield('body')
-        @include('game-api::partials.footer')
+    <body class="flex flex-col w-full h-screen justify-between">
+        <div>
+            @include('game-api::partials.nav')
+        </div>
+        <div>
+            @yield('body')
+        </div>
+        <div>
+            @include('game-api::partials.footer')
+        </div>
     </body>
 </html>
