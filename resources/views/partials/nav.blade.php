@@ -15,12 +15,24 @@
         <div class="flex flex-col justify-center">
             <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center"><a>Other</a></div>
         </div>
-        <div class="flex">
-            <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center"><a>Login</a></div>
-        </div>
+        @if(Auth::check())
         <div class="flex flex-col justify-center">
             <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center"><a>Profile</a></div>
         </div>
+        @endif
+        @if(Auth::check())
+            <div class="flex">
+                <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center">
+                    <a href="/logout">Logout</a>
+                </div>
+            </div>
+        @else
+            <div class="flex">
+                <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center">
+                    <a href="/login">Login</a>
+                </div>
+            </div>
+        @endif
     </div>
 </div>
 <hr>
