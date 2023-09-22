@@ -2,6 +2,7 @@
 
 namespace PartyGames\GameApi;
 
+use Illuminate\Support\Str;
 use PartyGames\GameApi\Models\Game;
 use PartyGames\GameApi\Models\GameInstances;
 
@@ -27,7 +28,8 @@ class GameApi
             'title' => $title,
             'game_id' => $game['id'],
             'user_id' => $userId,
-            'status' => 'created'
+            'status' => 'created',
+            'token' => GameAPi::createToken(15),
         ]);
 
         if (!$newGameInstance) {
@@ -52,4 +54,9 @@ class GameApi
         return "Woobly Jumbli {$this->name}";
     }
 
+    public static function createToken($length = 120)
+    {
+        //TODO: Check if token already exists and is active
+        return Str::random(15);
+    }
 }
