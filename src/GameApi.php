@@ -17,6 +17,24 @@ class GameApi
     {
     }
 
+    public static function registerGame($token, $details = [])
+    {
+        if (!isset($details['start_point_url'])) {
+            return ['status' => false, 'message' => 'Start point url is required.'];
+        }
+
+        Game::where('token', $token)->update([
+            'version' => $details['version'],
+            'start_point_url' => $details['start_point_url'],
+            'description' => $details['description'],
+            'creators_name' => $details['creators_name'],
+            'creators_url' => $details['creators_url'],
+            'is_enabled' => 1,
+        ]);
+
+        return ['status' => true, 'message' => 'Game is registered.'];
+    }
+
     public static function createGameInstance($token, $title)
     {
         $game = Game::where('token', '=', $token)->first();
@@ -44,7 +62,18 @@ class GameApi
         return ['status' => true, 'gameInstance' => $newGameInstance, 'message' => 'Woop Woop Game Instance is created!'];
     }
 
-    public static function getGameInstance()
+    public static function getGameInstance($gameToken = null)
+    {
+        $gameInstance = GameInstances::where('token', $gameToken)->first();
+
+        if (!$gameInstance) {
+            return ['status' => false, 'gameInstance' => NULL, 'message' => 'Could not find Game Instance'];
+        }
+
+        return ['status' => true, 'gameInstance' => $gameInstance, 'message' => 'Game Instance found'];
+    }
+
+    public static function changeGameInstanceStatus()
     {
 
     }
@@ -54,7 +83,7 @@ class GameApi
 
     }
 
-    public function joinGameInstance()
+    public function joinGameInstance($gameToken = null)
     {
 
     }

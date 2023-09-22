@@ -10,7 +10,7 @@
             <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center"><a>Home</a></div>
         </div>
         <div class="flex flex-col justify-center">
-            <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center"><a>Games</a></div>
+            <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center"><a href="/games">Games</a></div>
         </div>
         <div class="flex flex-col justify-center">
             <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center"><a>Other</a></div>
