@@ -5,6 +5,7 @@ namespace PartyGames\GameApi;
 use Illuminate\Support\Str;
 use PartyGames\GameApi\Models\Game;
 use PartyGames\GameApi\Models\GameInstances;
+use Illuminate\Support\Facades\Auth;
 
 class GameApi
 {
@@ -16,7 +17,7 @@ class GameApi
     {
     }
 
-    public static function createGameInstance($token, $title, $userId)
+    public static function createGameInstance($token, $title)
     {
         $game = Game::where('token', '=', $token)->first();
 
@@ -24,10 +25,14 @@ class GameApi
             return ['status' => false, 'gameInstance' => NULL, 'message' => 'Could not find Game'];
         }
 
+        if (!Auth::check()) {
+            return ['status' => false, 'gameInstance' => NULL, 'message' => 'You need to be logged in to create a game instance.'];
+        }
+
         $newGameInstance = GameInstances::create([
             'title' => $title,
             'game_id' => $game['id'],
-            'user_id' => $userId,
+            'user_id' => Auth::user()->id,
             'status' => 'created',
             'token' => GameAPi::createToken(15),
         ]);
@@ -45,6 +50,16 @@ class GameApi
     }
 
     public static function closeGameInstance()
+    {
+
+    }
+
+    public function joinGameInstance()
+    {
+
+    }
+
+    public function leaveGameInstance()
     {
 
     }
