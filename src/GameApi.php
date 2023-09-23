@@ -65,6 +65,7 @@ class GameApi
     public static function getGameInstance($gameToken = null)
     {
         $gameInstance = GameInstances::where('token', $gameToken)->first();
+        $gameInstance->load('user');
 
         if (!$gameInstance) {
             return ['status' => false, 'gameInstance' => NULL, 'message' => 'Could not find Game Instance'];
