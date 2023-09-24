@@ -5,6 +5,7 @@ namespace PartyGames\GameApi;
 use Illuminate\Support\Str;
 use PartyGames\GameApi\Models\Game;
 use PartyGames\GameApi\Models\GameInstances;
+use PartyGames\GameApi\Models\PlayerInstances;
 use Illuminate\Support\Facades\Auth;
 
 class GameApi
@@ -65,7 +66,7 @@ class GameApi
     public static function getGameInstance($gameToken = null)
     {
         $gameInstance = GameInstances::where('token', $gameToken)->first();
-        $gameInstance->load('user');
+        $gameInstance->load('user')->load('game')->load('playerInstances');
 
         if (!$gameInstance) {
             return ['status' => false, 'gameInstance' => NULL, 'message' => 'Could not find Game Instance'];
@@ -84,9 +85,27 @@ class GameApi
 
     }
 
-    public function joinGameInstance($gameToken = null)
+    public static function joinGameInstance($userId, $gameToken = null)
     {
+        $gameInstance = GameInstances::where('token', $gameToken)->first();
 
+        if (!$gameInstance) {
+            return ['status' => false, 'gameInstance' => NULL, 'playerInstance' => NULL, 'message' => 'Could not find Game Instance'];
+        }
+
+        $playerInstance = PlayerInstances::firstOrCreate([
+            'user_id' => $userId,
+            'game_instance_id' => $gameInstance->id,
+            'points' => 0,
+            'status' => 'joined',
+            'remote_data' => NULL,
+        ]);
+
+        if (!$playerInstance) {
+            return ['status' => false, 'gameInstance' => NULL, 'playerInstance' => NULL, 'message' => 'Could not join Game Instance'];
+        }
+
+        return ['status' => true, 'gameInstance' => $gameInstance, 'playerInstance' => $playerInstance, 'message' => 'Joined Game Instance'];
     }
 
     public function leaveGameInstance()

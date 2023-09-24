@@ -20,4 +20,9 @@ class GameInstances extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function playerInstances()
+    {
+        return $this->hasMany(PlayerInstances::class, 'game_instance_id', 'id');
+    }
+
 }
