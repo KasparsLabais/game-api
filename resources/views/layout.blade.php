@@ -21,6 +21,27 @@
         <!-- Scripts -->
         <script src="{{ asset('js/app.js') }}" defer></script>
 
+        <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous">
+        </script>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous">
+        </script>
+
+        <script>
+            @if(Auth::check())
+                window.username  = '{!! Auth::user()->username !!}';
+                window.id  = {!! Auth::user()->id !!};
+
+                $(document).ready(function() {
+                    var socket = io('http://localhost:3000');
+                    socket.on('connect', function(data) {
+                        socket.emit('userconnected', {'username': window.username, 'id': window.id});
+                    });
+
+                    socket.emit('message', 'Hello World from client')
+                });
+            @endif
+        </script>
     </head>
     <body class="flex flex-col w-full h-screen justify-between">
         <div>
