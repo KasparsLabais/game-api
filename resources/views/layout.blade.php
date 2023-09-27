@@ -20,6 +20,7 @@
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
         <!-- Scripts -->
         <script src="{{ asset('js/app.js') }}" defer></script>
+        <script src="{{ asset('/vendor/game-api/js/game.js') }}"></script>
 
         <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous">
         </script>
@@ -31,15 +32,10 @@
             @if(Auth::check())
                 window.username  = '{!! Auth::user()->username !!}';
                 window.id  = {!! Auth::user()->id !!};
-
-                $(document).ready(function() {
-                    var socket = io('http://localhost:3000');
-                    socket.on('connect', function(data) {
-                        socket.emit('userconnected', {'username': window.username, 'id': window.id});
-                    });
-
-                    socket.emit('message', 'Hello World from client')
-                });
+                socket.emit('message', 'Hello World from client')
+            @else
+                window.username = 'guest';
+                window.id = 0;
             @endif
         </script>
     </head>

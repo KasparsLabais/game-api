@@ -11,6 +11,11 @@ class GameApiServiceProvider extends ServiceProvider
         //$this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
         $this->loadViewsFrom(__DIR__ . '/../resources/views/', 'game-api');
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
+        $this->publishes([
+            __DIR__ . '/../resources/static' => public_path('vendor/game-api')],
+            'game-api-assets'
+        );
     }
 
     public function register()
