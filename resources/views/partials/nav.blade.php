@@ -7,30 +7,34 @@
     </div>
     <div class="flex flex-row justify-center">
         <div class="flex flex-col justify-center">
-            <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center"><a>Home</a></div>
+            <a href="/" class="px-8 py-2 hover:text-slate-300 hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center">
+                Home
+            </a>
         </div>
         <div class="flex flex-col justify-center">
-            <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center"><a href="/games">Games</a></div>
+            <a href="/games" class="px-8 py-2 hover:text-slate-300 hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center">
+                Games
+            </a>
         </div>
         <div class="flex flex-col justify-center">
-            <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center"><a>Other</a></div>
+            <a class="px-8 py-2 hover:text-slate-300 hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center">Other</a>
         </div>
         @if(Auth::check())
         <div class="flex flex-col justify-center">
-            <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center"><a>Profile</a></div>
+            <a class="px-8 py-2 hover:text-slate-300 hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center">Profile</a>
         </div>
         @endif
         @if(Auth::check())
             <div class="flex">
-                <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center">
-                    <a href="/logout">Logout</a>
-                </div>
+                <a href="/logout" class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center">
+                    Logout
+                </a>
             </div>
         @else
             <div class="flex">
-                <div class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center">
-                    <a href="/login">Login</a>
-                </div>
+                <a href="/login" class="px-8 py-2 hover:text-slate-300	hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center">
+                    Login
+                </a>
             </div>
         @endif
     </div>
