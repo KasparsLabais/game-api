@@ -36,7 +36,7 @@ class GameApi
         return ['status' => true, 'message' => 'Game is registered.'];
     }
 
-    public static function createGameInstance($token, $title)
+    public static function createGameInstance($token, $title, $remoteData = NULL)
     {
         $game = Game::where('token', '=', $token)->first();
 
@@ -54,6 +54,7 @@ class GameApi
             'user_id' => Auth::user()->id,
             'status' => 'created',
             'token' => GameAPi::createToken(15),
+            'remote_data' => json_encode($remoteData)
         ]);
 
         if (!$newGameInstance) {
@@ -75,9 +76,18 @@ class GameApi
         return ['status' => true, 'gameInstance' => $gameInstance, 'message' => 'Game Instance found'];
     }
 
-    public static function changeGameInstanceStatus()
+    public static function changeGameInstanceStatus($gameToken, $status = 'created')
     {
+        GameInstances::where('token', $gameToken)->update([
+            'status' => $status,
+        ]);
+    }
 
+    public static function updateGameInstanceRemoteData($gameToken, $remoteData)
+    {
+        GameInstances::where('token', $gameToken)->update([
+            'remote_data' => $remoteData,
+        ]);
     }
 
     public static function closeGameInstance()
