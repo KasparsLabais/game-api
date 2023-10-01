@@ -17,39 +17,39 @@ socket.on('gameInstanceUpdated', (data) => {
     callbackGameInstanceUpdated(data.gameToken, data.gameInstance, data.action);
 });
 
-const joinRoom = (gameToken, repeatCount = 0) => {
-    socket.emit('joinRoom', { 'gameToken' : gameToken, 'repeatCount' : repeatCount}, (answer) => {
-        if (!answer.status && answer.repeatCount  < 10) {
-            setTimeout(() => { console.log('Repeat'); joinRoom(gameToken, answer.repeatCount); }, 1000);
-        }
-    });
-}
-
-const joinGameInstance = (gameToken, redirectUrl, repeatCount = 0) => {
-    socket.emit('joinGameInstance', { 'gameToken' : gameToken, 'repeatCount' : repeatCount}, (answer) => {
-        if (!answer.status && answer.repeatCount  < 10) {
-            setTimeout(() => { console.log('Repeat'); joinGameInstance(gameToken, redirectUrl, answer.repeatCount); }, 1000);
-        } else {
-            console.log('Redirecting to ', redirectUrl);
-            window.location.href = redirectUrl;
-        }
-    });
-}
-
-const addGameInstance = (gameToken, game) => {
-    console.log('addGameInstance', gameToken, game);
-
-    gameInstance = game;
-    socket.emit('addOrUpdateGameInstance', { 'gameToken': gameToken, 'gameInstance':game });
-}
-const getGameInstance = (gameToken) => {
-    socket.emit('getGameInstance', { gameToken });
-}
-
-const updateGameInstance = (gameToken, gameInstance, action = 'updateGameInstanceStatus') => {
-    socket.emit('updateGameInstance', { 'gameToken': gameToken, 'gameInstance':gameInstance, 'action': action });
-}
-
-const redirect = (gameToken, url) => {
-    socket.emit('redirect', { 'gameToken': gameToken, 'url': url });
+const GameApi = {
+    'joinRoom': function(gameToken, repeatCount = 0) {
+        socket.emit('joinRoom', { 'gameToken' : gameToken, 'repeatCount' : repeatCount}, (answer) => {
+            if (!answer.status && answer.repeatCount  < 10) {
+                setTimeout(() => { console.log('Repeat'); GameApi.joinRoom(gameToken, answer.repeatCount); }, 1000);
+            }
+        });
+    },
+    'joinGameInstance': function(gameToken, redirectUrl, repeatCount = 0) {
+        socket.emit('joinGameInstance', { 'gameToken' : gameToken, 'repeatCount' : repeatCount}, (answer) => {
+            if (!answer.status && answer.repeatCount  < 10) {
+                setTimeout(() => { console.log('Repeat'); GameApi.joinGameInstance(gameToken, redirectUrl, answer.repeatCount); }, 1000);
+            } else {
+                console.log('Redirecting to ', redirectUrl);
+                window.location.href = redirectUrl;
+            }
+        });
+    },
+    'addGameInstance': function(gameToken, game) {
+        console.log('addGameInstance', gameToken, game);
+        gameInstance = game;
+        socket.emit('addOrUpdateGameInstance', { 'gameToken': gameToken, 'gameInstance':game });
+    },
+    'getGameInstance': function(gameToken) {
+        console.log('getGameInstance', gameToken);
+        socket.emit('getGameInstance', { gameToken });
+    },
+    'updateGameInstance': function(gameToken, gameInstance, action = 'updateGameInstanceStatus') {
+        console.log('updateGameInstance', gameToken, gameInstance);
+        socket.emit('updateGameInstance', { 'gameToken': gameToken, 'gameInstance':gameInstance, 'action': action });
+    },
+    'redirect': function(gameToken, url) {
+        console.log('redirect', gameToken, url);
+        socket.emit('redirect', { 'gameToken': gameToken, 'url': url });
+    }
 }
