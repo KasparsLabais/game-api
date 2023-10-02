@@ -78,9 +78,10 @@ class GameApi
 
     public static function changeGameInstanceStatus($gameToken, $status = 'created')
     {
-        $gameInstance = GameInstances::where('token', $gameToken)->where('user_id', Auth::user()->id)->update([
+        GameInstances::where('token', $gameToken)->where('user_id', Auth::user()->id)->update([
             'status' => $status,
         ]);
+        $gameInstance = GameInstances::where('token', $gameToken)->first();
         return ['status' => true, 'gameInstance' => $gameInstance, 'message' => 'Game Instance status changed'];
     }
 
