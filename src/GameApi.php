@@ -135,4 +135,28 @@ class GameApi
         //TODO: Check if token already exists and is active
         return Str::random(15);
     }
+
+    public static function getPlayerInstance($gameInstanceId, $userId)
+    {
+        $playerInstance = PlayerInstances::where('game_instance_id', $gameInstanceId)->where('user_id', $userId)->first();
+        if(!$playerInstance){
+            return ['status' => false, 'playerInstance' => NULL, 'message' => 'Could not find Player Instance'];
+        }
+
+        return ['status' => true, 'playerInstance' => $playerInstance, 'message' => 'Player Instance found'];
+    }
+
+    public static function updatePlayerInstanceScore($playerInstanceId, $score)
+    {
+        PlayerInstances::where('id', $playerInstanceId)->update([
+            'points' => $score,
+        ]);
+    }
+
+    public static function updatePlayerInstanceRemoteData($playerInstanceId, $remoteData)
+    {
+        PlayerInstances::where('id', $playerInstanceId)->update([
+            'remote_data' => $remoteData,
+        ]);
+    }
 }
