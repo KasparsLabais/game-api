@@ -48,6 +48,10 @@ const GameApi = {
         console.log('updateGameInstance', gameToken, gameInstance);
         socket.emit('updateGameInstance', { 'gameToken': gameToken, 'gameInstance':gameInstance, 'action': action });
     },
+    'updatePlayerInstance': function(gameToken, playerInstance, action = 'updatePlayerInstanceStatus') {
+        console.log('updatePlayerInstance', gameToken, playerInstance);
+        socket.emit('updatePlayerInstance', { 'gameToken': gameToken, 'playerInstance':playerInstance, 'action': action });
+    },
     'redirect': function(gameToken, url) {
         console.log('redirect', gameToken, url);
         socket.emit('redirect', { 'gameToken': gameToken, 'url': url });
