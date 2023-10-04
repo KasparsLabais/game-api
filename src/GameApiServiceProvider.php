@@ -4,6 +4,7 @@ namespace PartyGames\GameApi;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Blade;
 class GameApiServiceProvider extends ServiceProvider
 {
     public function boot()
@@ -16,6 +17,8 @@ class GameApiServiceProvider extends ServiceProvider
             __DIR__ . '/../resources/static' => public_path('vendor/game-api')],
             'game-api-assets'
         );
+
+        Blade::component('game-api::components.points', 'points');
     }
 
     public function register()

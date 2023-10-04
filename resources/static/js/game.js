@@ -17,6 +17,11 @@ socket.on('gameInstanceUpdated', (data) => {
     callbackGameInstanceUpdated(data.gameToken, data.gameInstance, data.action);
 });
 
+socket.on('updatePoints', (data) => {
+    console.log('updatePoints', data);
+    GameApi.updatePointsUI(data.points);
+});
+
 const GameApi = {
     'joinRoom': function(gameToken, repeatCount = 0) {
         socket.emit('joinRoom', { 'gameToken' : gameToken, 'repeatCount' : repeatCount}, (answer) => {
@@ -55,5 +60,10 @@ const GameApi = {
     'redirect': function(gameToken, url) {
         console.log('redirect', gameToken, url);
         socket.emit('redirect', { 'gameToken': gameToken, 'url': url });
+    },
+    'updatePointsUI': function(points) {
+        console.log('updatePointsUI', points);
+        let pointsHolder = document.getElementById('game-api-_points-holder');
+        pointsHolder.innerHTML = points;
     }
 }
