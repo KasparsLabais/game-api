@@ -22,6 +22,16 @@ socket.on('updatePoints', (data) => {
     GameApi.updatePointsUI(data.points);
 });
 
+socket.on('playerInstanceUpdated', (data) => {
+    console.log('playerInstanceUpdated', data);
+    document.dispatchEvent(new CustomEvent(data.action, { detail: data }));
+});
+
+socket.on('notifyGameMaster', (data) => {
+    console.log('notifyGameMaster', data);
+    document.dispatchEvent(new CustomEvent(data.action, { detail: data }));
+});
+
 const GameApi = {
     'joinRoom': function(gameToken, repeatCount = 0) {
         socket.emit('joinRoom', { 'gameToken' : gameToken, 'repeatCount' : repeatCount}, (answer) => {
@@ -60,6 +70,10 @@ const GameApi = {
     'redirect': function(gameToken, url) {
         console.log('redirect', gameToken, url);
         socket.emit('redirect', { 'gameToken': gameToken, 'url': url });
+    },
+    'notifyGameMaster': function(gameToken, data) {
+        console.log('notifyGameMaster', gameToken, data);
+        socket.emit('notifyGameMaster', { 'gameToken': gameToken, 'data': data });
     },
     'updatePointsUI': function(points) {
         console.log('updatePointsUI', points);
