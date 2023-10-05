@@ -29,9 +29,11 @@
             @if(Auth::check())
                 window.username  = '{!! Auth::user()->username !!}';
                 window.id  = {!! Auth::user()->id !!};
+                window.playerToken =  '{!! Auth::user()->unique_token !!}'
             @else
                 window.username = 'guest';
                 window.id = 0;
+                window.playerToken = '';
             @endif
         </script>
     </head>
