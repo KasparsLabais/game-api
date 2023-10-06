@@ -34,14 +34,15 @@ socket.on('notifyGameMaster', (data) => {
 
 const GameApi = {
     'joinRoom': function(gameToken, repeatCount = 0) {
-        socket.emit('joinRoom', { 'gameToken' : gameToken, 'repeatCount' : repeatCount}, (answer) => {
+        socket.emit('joinRoom', { 'gameToken' : gameToken, 'repeatCount' : repeatCount, 'playerToken': window.playerToken}, (answer) => {
             if (!answer.status && answer.repeatCount  < 10) {
                 setTimeout(() => { console.log('Repeat'); GameApi.joinRoom(gameToken, answer.repeatCount); }, 1000);
             }
         });
     },
     'joinGameInstance': function(gameToken, redirectUrl, repeatCount = 0) {
-        socket.emit('joinGameInstance', { 'gameToken' : gameToken, 'repeatCount' : repeatCount}, (answer) => {
+        console.log('joinGameInstance', gameToken, redirectUrl, repeatCount);
+        socket.emit('joinGameInstance', { 'gameToken' : gameToken, 'repeatCount' : repeatCount, 'playerToken': window.playerToken}, (answer) => {
             if (!answer.status && answer.repeatCount  < 10) {
                 setTimeout(() => { console.log('Repeat'); GameApi.joinGameInstance(gameToken, redirectUrl, answer.repeatCount); }, 1000);
             } else {
