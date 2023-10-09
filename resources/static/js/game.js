@@ -4,7 +4,7 @@ var gameInstance = {};
 var socket = io('http://localhost:3000');
 socket.on('connect', function(data) {
     console.log('connect', data);
-    socket.emit('userconnected', {'username': window.username, 'id': window.id, 'token' : window.playerToken });
+    socket.emit('userconnected', {'username': window.username, 'id': window.id, 'playerToken' : window.playerToken });
 });
 socket.on('playerJoined', (data) => {
     console.log('playerJoined', data);
@@ -54,7 +54,7 @@ const GameApi = {
     'addGameInstance': function(gameToken, game) {
         console.log('addGameInstance', gameToken, game);
         gameInstance = game;
-        socket.emit('addOrUpdateGameInstance', { 'gameToken': gameToken, 'gameInstance':game });
+        socket.emit('addOrUpdateGameInstance', { 'gameToken': gameToken, 'gameInstance':game, 'playerToken': window.playerToken});
     },
     'getGameInstance': function(gameToken) {
         console.log('getGameInstance', gameToken);
@@ -62,11 +62,11 @@ const GameApi = {
     },
     'updateGameInstance': function(gameToken, gameInstance, action = 'updateGameInstanceStatus') {
         console.log('updateGameInstance', gameToken, gameInstance);
-        socket.emit('updateGameInstance', { 'gameToken': gameToken, 'gameInstance':gameInstance, 'action': action });
+        socket.emit('updateGameInstance', { 'gameToken': gameToken, 'gameInstance':gameInstance, 'action': action, 'playerToken': window.playerToken});
     },
     'updatePlayerInstance': function(gameToken, playerInstance, action = 'updatePlayerInstanceStatus') {
         console.log('updatePlayerInstance', gameToken, playerInstance);
-        socket.emit('updatePlayerInstance', { 'gameToken': gameToken, 'playerInstance':playerInstance, 'action': action });
+        socket.emit('updatePlayerInstance', { 'gameToken': gameToken, 'playerInstance':playerInstance, 'action': action, 'playerToken': window.playerToken});
     },
     'redirect': function(gameToken, url) {
         console.log('redirect', gameToken, url);
