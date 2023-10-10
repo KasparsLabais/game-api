@@ -156,7 +156,7 @@ class GameApi
     public static function updatePlayerInstanceRemoteData($playerInstanceId, $remoteData)
     {
         PlayerInstances::where('id', $playerInstanceId)->update([
-            'remote_data' => $remoteData,
+            'remote_data' => json_encode($remoteData),
         ]);
     }
 }
