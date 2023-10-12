@@ -1,1 +1,1 @@
-<span id="game-api-_points-holder">0</span>
+<span id="game-api-_points-holder">{{ $points }}</span>

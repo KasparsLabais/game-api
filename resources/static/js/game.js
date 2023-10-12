@@ -14,7 +14,9 @@ socket.on('playerJoined', (data) => {
 socket.on('gameInstanceUpdated', (data) => {
     console.log('gameInstanceUpdated', data);
     gameInstance = data.gameInstance;
-    callbackGameInstanceUpdated(data.gameToken, data.gameInstance, data.action);
+    //Change callbackgameInstanceUpdate to dispatchEvent
+    document.dispatchEvent(new CustomEvent(data.action, { detail: data }));
+    //callbackGameInstanceUpdated(data.gameToken, data.gameInstance, data.action);
 });
 
 socket.on('updatePoints', (data) => {
@@ -29,7 +31,13 @@ socket.on('playerInstanceUpdated', (data) => {
 
 socket.on('notifyGameMaster', (data) => {
     console.log('notifyGameMaster', data);
-    document.dispatchEvent(new CustomEvent(data.action, { detail: data }));
+    console.log('notifyGameMaster', data.data.action);
+    document.dispatchEvent(new CustomEvent(data.data.action, { detail: data.data.data }));
+});
+
+socket.on('notifyRoom', (data) => {
+    console.log('notifyRoom', data);
+    document.dispatchEvent(new CustomEvent(data.data.action, { detail: data.data.payload }));
 });
 
 const GameApi = {
@@ -64,7 +72,7 @@ const GameApi = {
         console.log('updateGameInstance', gameToken, gameInstance);
         socket.emit('updateGameInstance', { 'gameToken': gameToken, 'gameInstance':gameInstance, 'action': action, 'playerToken': window.playerToken});
     },
-    'updatePlayerInstance': function(gameToken, playerInstance, action = 'updatePlayerInstanceStatus') {
+    'updatePlayerInstance': function(gameToken, playerInstance, action = 'emptyAction') {
         console.log('updatePlayerInstance', gameToken, playerInstance);
         socket.emit('updatePlayerInstance', { 'gameToken': gameToken, 'playerInstance':playerInstance, 'action': action, 'playerToken': window.playerToken});
     },
@@ -74,7 +82,11 @@ const GameApi = {
     },
     'notifyGameMaster': function(gameToken, data) {
         console.log('notifyGameMaster', gameToken, data);
-        socket.emit('notifyGameMaster', { 'gameToken': gameToken, 'data': data });
+        socket.emit('notifyGameMaster', { 'gameToken': gameToken, 'data': data, 'playerToken': window.playerToken });
+    },
+    'notifyRoom': function(gameToken, data) {
+        console.log('notifyRoom', gameToken, data);
+        socket.emit('notifyRoom', { 'gameToken': gameToken, 'data': data, 'playerToken': window.playerToken });
     },
     'updatePointsUI': function(points) {
         console.log('updatePointsUI', points);
