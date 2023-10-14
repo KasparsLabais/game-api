@@ -2,6 +2,7 @@
 
 namespace PartyGames\GameApi;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use PartyGames\GameApi\Models\Game;
 use PartyGames\GameApi\Models\GameInstances;
@@ -158,5 +159,24 @@ class GameApi
         PlayerInstances::where('id', $playerInstanceId)->update([
             'remote_data' => json_encode($remoteData),
         ]);
+    }
+
+    public static function getWinners($gameInstanceId)
+    {
+        $players = PlayerInstances::where('game_instance_id', $gameInstanceId)->orderBy('points', 'desc')->get();
+
+        $winners = [];
+        if ($players->where('user_id', '!=', $players->first()->user_id)->count() > 0) {
+            foreach ($players->where('user_id', '!=', $players->first()->user_id) as $player) {
+                $winners[] = $player->load('user');
+            }
+        }
+
+        $response = [
+            'winner' => $players->first()->load('user'),
+            'winners' => $winners
+        ];
+
+        return ['status' => true, 'response' => $response, 'message' => 'Winners found'];
     }
 }

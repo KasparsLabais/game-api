@@ -2,10 +2,10 @@
     <div class="flex flex-row px-12">
         <img src="https://via.placeholder.com/65" alt="Logo">
         <div class="flex flex-col justify-center">
-            <h1 class="px-2">Game API</h1>
+            <h1 class="px-2 fira-sans">Party Games</h1>
         </div>
     </div>
-    <div class="flex flex-row justify-center">
+    <div class="flex flex-row justify-center raleway">
         <div class="flex flex-col justify-center">
             <a href="/" class="px-8 py-2 hover:text-slate-300 hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center">
                 Home
@@ -16,12 +16,9 @@
                 Games
             </a>
         </div>
-        <div class="flex flex-col justify-center">
-            <a class="px-8 py-2 hover:text-slate-300 hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center">Other</a>
-        </div>
         @if(Auth::check())
         <div class="flex flex-col justify-center">
-            <a class="px-8 py-2 hover:text-slate-300 hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center">Profile</a>
+            <a href="/profile" class="px-8 py-2 hover:text-slate-300 hover:bg-gray-800 ease-linear duration-200 h-16 flex flex-col justify-center">Profile</a>
         </div>
         @endif
         @if(Auth::check())
