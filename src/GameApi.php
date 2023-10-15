@@ -172,6 +172,11 @@ class GameApi
             }
         }
 
+        //orders $winners by points
+        usort($winners, function ($a, $b) {
+            return $a->points <= $b->points;
+        });
+
         $response = [
             'winner' => $players->first()->load('user'),
             'winners' => $winners

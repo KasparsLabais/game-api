@@ -43,10 +43,12 @@
                 window.username  = '{!! Auth::user()->username !!}';
                 window.id  = {!! Auth::user()->id !!};
                 window.playerToken =  '{!! Auth::user()->unique_token !!}'
+                window.avatar = @if(is_null(Auth::user()->avatar)) '/images/default-avatar.jpg' @else '{!! Auth::user()->avatar !!}' @endif;
             @else
                 window.username = 'guest';
                 window.id = 0;
                 window.playerToken = '';
+                window.avatar = '/images/default-avatar.jpg';
             @endif
         </script>
     </head>

@@ -4,7 +4,7 @@ var gameInstance = {};
 var socket = io('http://localhost:3000');
 socket.on('connect', function(data) {
     console.log('connect', data);
-    socket.emit('userconnected', {'username': window.username, 'id': window.id, 'playerToken' : window.playerToken });
+    socket.emit('userconnected', {'username': window.username, 'id': window.id, 'avatar': window.avatar, 'playerToken' : window.playerToken });
 });
 socket.on('playerJoined', (data) => {
     console.log('playerJoined', data);
