@@ -184,4 +184,16 @@ class GameApi
 
         return ['status' => true, 'response' => $response, 'message' => 'Winners found'];
     }
+
+    public static function addUserStats($userId, $key, $value)
+    {
+        $userStats = UserStats::firstOrCreate([
+            'user_id' => $userId,
+            'key' => $key,
+            'value' => $value,
+        ]);
+
+        return ['status' => true, 'userStats' => $userStats, 'message' => 'User Stats added'];
+    }
+
 }
