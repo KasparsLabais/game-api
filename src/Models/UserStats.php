@@ -1,5 +1,7 @@
 <?php
 
+namespace PartyGames\GameApi\Models;
+
 use Illuminate\Database\Eloquent\Model;
 class UserStats extends Model
 {

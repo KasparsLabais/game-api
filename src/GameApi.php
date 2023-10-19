@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use PartyGames\GameApi\Models\Game;
 use PartyGames\GameApi\Models\GameInstances;
 use PartyGames\GameApi\Models\PlayerInstances;
+use PartyGames\GameApi\Models\UserStats;
 use Illuminate\Support\Facades\Auth;
 
 class GameApi
@@ -194,6 +195,17 @@ class GameApi
         ]);
 
         return ['status' => true, 'userStats' => $userStats, 'message' => 'User Stats added'];
+    }
+
+    public static function getUserStats($userId, $key)
+    {
+        $userStats = UserStats::where('user_id', $userId)->where('key', $key)->first();
+
+        if(!$userStats){
+            return ['status' => false, 'userStats' => NULL, 'message' => 'Could not find User Stats'];
+        }
+
+        return ['status' => true, 'userStats' => $userStats, 'message' => 'User Stats found'];
     }
 
 }
