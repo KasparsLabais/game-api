@@ -11,7 +11,7 @@ class AddUserStatsTable extends Migration
         Schema::create('user_stats', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
-            $table->integer('key');
+            $table->string('key');
             $table->string('value');
             $table->timestamps();
         });

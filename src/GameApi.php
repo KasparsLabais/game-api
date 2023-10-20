@@ -84,6 +84,16 @@ class GameApi
             'status' => $status,
         ]);
         $gameInstance = GameInstances::where('token', $gameToken)->first();
+
+        switch ($status) {
+            case 'completed':
+                self::updateUserStatsWithPoints($gameToken);
+                self::closePlayerInstances($gameToken);
+                break;
+            default:
+                break;
+        }
+
         return ['status' => true, 'gameInstance' => $gameInstance, 'message' => 'Game Instance status changed'];
     }
 
@@ -188,24 +198,94 @@ class GameApi
 
     public static function addUserStats($userId, $key, $value)
     {
-        $userStats = UserStats::firstOrCreate([
-            'user_id' => $userId,
-            'key' => $key,
-            'value' => $value,
-        ]);
+        $userStats = UserStats::where('user_id', $userId)->where('key', $key)->first();
+        if ($userStats) {
+            $userStats->value = $value + $userStats->value;
+            $userStats->save();
+        } else {
+            $userStats = UserStats::create([
+                'user_id' => $userId,
+                'key' => $key,
+                'value' => $value,
+            ]);
+        }
+        return ['status' => true, 'userStats' => $userStats, 'message' => 'User Stats added'];
+    }
 
+    public static function replaceUserStats($userId, $key, $value)
+    {
+        $userStats = UserStats::where('user_id', $userId)->where('key', $key)->first();
+        if ($userStats) {
+            $userStats->value = $value;
+            $userStats->save();
+        } else {
+            $userStats = UserStats::create([
+                'user_id' => $userId,
+                'key' => $key,
+                'value' => $value,
+            ]);
+        }
         return ['status' => true, 'userStats' => $userStats, 'message' => 'User Stats added'];
     }
 
     public static function getUserStats($userId, $key)
     {
         $userStats = UserStats::where('user_id', $userId)->where('key', $key)->first();
-
         if(!$userStats){
-            return ['status' => false, 'userStats' => NULL, 'message' => 'Could not find User Stats'];
+            return null;
         }
-
-        return ['status' => true, 'userStats' => $userStats, 'message' => 'User Stats found'];
+        return $userStats;
     }
 
+    public static function updateUserStatsWithPoints($gameToken)
+    {
+        $gameInstance = GameInstances::where('token', $gameToken)->where('user_id', Auth::user()->id)->first();
+        if (!$gameInstance) {
+            return false;
+        }
+        $playerInstances = PlayerInstances::where('game_instance_id', $gameInstance->id)->get();
+
+        foreach ($playerInstances as $player) {
+            self::addUserStats($player->user_id, 'points', $player->points);
+        }
+
+        return ['status' => true, 'message' => 'User Stats updated'];
+    }
+
+    public static function closePlayerInstances($gameToken)
+    {
+        $gameInstance = GameInstances::where('token', $gameToken)->where('user_id', Auth::user()->id)->first();
+        if (!$gameInstance) {
+            return ['status' => false, 'message' => 'Could not find Game Instance'];
+        }
+        $playerInstances = PlayerInstances::where('game_instance_id', $gameInstance->id)->get();
+        foreach ($playerInstances as $player) {
+            $player->status = 'completed';
+            $player->save();
+        }
+        return ['status' => true, 'message' => 'Player Instances closed'];
+    }
+
+    public static function closePlayerInstance($playerInstanceId)
+    {
+        $playerInstance = PlayerInstances::where('id', $playerInstanceId)->where('user_id', Auth::user()->id)->first();
+        if (!$playerInstance) {
+            return ['status' => false, 'message' => 'Could not find Player Instance'];
+        }
+
+        $playerInstance->status = 'completed';
+        $playerInstance->save();
+
+        return ['status' => true, 'message' => 'Player Instance closed'];
+    }
+
+
+    public static function getUserActivePlayerInstances($userId)
+    {
+        if(Auth::user()->id != $userId){
+            return [];
+        }
+        $playerInstances = PlayerInstances::where('user_id', $userId)->where('status', '!=', 'completed')->get();
+        return $playerInstances;
+    }
 }
