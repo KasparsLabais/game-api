@@ -288,4 +288,47 @@ class GameApi
         $playerInstances = PlayerInstances::where('user_id', $userId)->where('status', '!=', 'completed')->get();
         return $playerInstances;
     }
+
+    public static function getAllGames()
+    {
+        /*
+         *   game: {
+                title: 'First Test Trivia',
+                game_id: 1,
+                user_id: 1,
+                status: 'created',
+                token: '0cSIur2wbp8jKlR',
+                remote_data: '{"trivia_id":1}',
+                updated_at: '2023-10-20T14:21:50.000000Z',
+                created_at: '2023-10-20T14:21:50.000000Z',
+                id: 117
+              },
+              players: {
+                '2': {
+                  username: 'BobTheBuilder',
+                  playerToken: '76e0647fad935af98766468805f835ff',
+                  id: 2,
+                  avatar: '/images/default-avatar.jpg'
+                }
+              }
+         */
+
+        $returnObject = [];
+
+        $allOpenGameInstances = GameInstances::where('status', '!=', 'completed')->get();
+        foreach ($allOpenGameInstances as $game) {
+
+            $returnObject[] = [
+                'game' => $game->toArray(),
+                'players' => $game->playerInstances->load('user')->toArray()
+            ];
+
+           // $game->load('game')->load('playerInstances');
+
+        }
+//dd($returnObject);
+        return ['games' => $returnObject];
+
+        die($allOpenGameInstances);
+    }
 }

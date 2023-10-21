@@ -25,4 +25,15 @@ class BaseController
         ]);
     }
 
+
+    public function getAllGames(Request $request)
+    {
+        $response = GameApi::getAllGames();
+        return response()->json([
+            'success' => true,
+            'message' => 'Games found',
+            'games' => $response['games']
+        ]);
+    }
+
 }
