@@ -28,7 +28,7 @@ class BaseController
 
     public function getAllGames(Request $request)
     {
-        $response = GameApi::getAllGames();
+        $response = GameApi::getAllGames(1);
         return response()->json([
             'success' => true,
             'message' => 'Games found',
