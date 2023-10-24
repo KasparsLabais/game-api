@@ -2,7 +2,7 @@ var playerList = {};
 var gameInstance = {};
 
 //var socket = io('http://localhost:3000');
-var socket = io('http://poker-bank.com');
+var socket = io('http://is-a.gay/socket/');
 socket.on('connect', function(data) {
     console.log('connect', data);
     socket.emit('userconnected', {'username': window.username, 'id': window.id, 'avatar': window.avatar, 'playerToken' : window.playerToken });
