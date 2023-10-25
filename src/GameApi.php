@@ -288,18 +288,15 @@ class GameApi
     }
 
 
-    public static function getUserActivePlayerInstances($userId)
+    public static function getUserActivePlayerInstances()
     {
-        if(Auth::user()->id != $userId){
-            return [];
-        }
-        $playerInstances = PlayerInstances::where('user_id', $userId)->where('status', '!=', 'completed')->get();
+        $playerInstances = PlayerInstances::where('user_id', Auth::user()->id)->where('status', '!=', 'completed')->get();
         return $playerInstances;
     }
 
-    public static function getUserActiveGameInstances($userId)
+    public static function getUserActiveGameInstances()
     {
-        $gameInstances = GameInstances::where('user_id', $userId)->where(function ($q) {
+        $gameInstances = GameInstances::where('user_id', Auth::user()->id)->where(function ($q) {
             return $q->where('status', '!=', 'completed') && $q->where('status', '!=', 'closed');
         })->get();
         if(!$gameInstances) {
@@ -322,5 +319,11 @@ class GameApi
         }
 
         return ['games' => $returnObject];
+    }
+
+    public static function getPlayersTotalGamesPlayed()
+    {
+        $totalGames = PlayerInstances::where('user_id', Auth::user()->id)->groupBy('game_instance_id')->count();
+        return $totalGames;
     }
 }
