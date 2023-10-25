@@ -104,11 +104,6 @@ class GameApi
         ]);
     }
 
-    public static function closeGameInstance()
-    {
-
-    }
-
     public static function joinGameInstance($userId, $gameToken = null)
     {
         $gameInstance = GameInstances::where('token', $gameToken)->first();
@@ -252,6 +247,19 @@ class GameApi
         return ['status' => true, 'message' => 'User Stats updated'];
     }
 
+
+    public static function closeGameInstance($gameId)
+    {
+        $gameInstance = GameInstances::where('id', $gameId)->where('user_id', Auth::user()->id)->first();
+        if(!$gameInstance){
+            return ['status' => false, 'message' => 'Could not find Game Instance'];
+        }
+
+        $gameInstance->status = 'closed';
+        $gameInstance->save();
+
+        return ['status' => true, 'message' => 'Game Instance closed'];
+    }
     public static function closePlayerInstances($gameToken)
     {
         $gameInstance = GameInstances::where('token', $gameToken)->where('user_id', Auth::user()->id)->first();
@@ -287,6 +295,18 @@ class GameApi
         }
         $playerInstances = PlayerInstances::where('user_id', $userId)->where('status', '!=', 'completed')->get();
         return $playerInstances;
+    }
+
+    public static function getUserActiveGameInstances($userId)
+    {
+        $gameInstances = GameInstances::where('user_id', $userId)->where(function ($q) {
+            return $q->where('status', '!=', 'completed') && $q->where('status', '!=', 'closed');
+        })->get();
+        if(!$gameInstances) {
+            return [];
+        }
+
+        return $gameInstances;
     }
 
     public static function getAllGames($isActive = 0)
