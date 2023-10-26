@@ -8,6 +8,8 @@ use PartyGames\GameApi\Models\Game;
 use PartyGames\GameApi\Models\GameInstances;
 use PartyGames\GameApi\Models\PlayerInstances;
 use PartyGames\GameApi\Models\UserStats;
+use PartyGames\GameApi\Models\GameInstanceSettings;
+
 use Illuminate\Support\Facades\Auth;
 
 class GameApi
@@ -326,4 +328,60 @@ class GameApi
         $totalGames = PlayerInstances::where('user_id', Auth::user()->id)->groupBy('game_instance_id')->count();
         return $totalGames;
     }
+
+    public static function addOrUpdateGameInstanceSetting($gameToken, $key, $value)
+    {
+        $gameInstance = GameInstances::where('token', $gameToken)->where('user_id', Auth::user()->id)->first();
+        if(!$gameInstance){
+            return ['status' => false, 'message' => 'Could not find Game Instance', 'gameInstanceSetting' => NULL];
+        }
+
+        $gameInstanceSetting = GameInstanceSettings::firstOrCreate([
+            'game_instance_id' => $gameInstance->id,
+            'key' => $key,
+        ]);
+
+        $gameInstanceSetting->value = $value;
+        $gameInstanceSetting->save();
+
+        return ['status' => true, 'message' => 'Game Instance Setting added', 'gameInstanceSetting' => $gameInstanceSetting];
+    }
+
+    public static function getGameInstanceSettings($gameToken, $key = null)
+    {
+        $gameInstance = GameInstances::where('token', $gameToken)->first();
+        if(!$gameInstance){
+            return ['status' => false, 'message' => 'Could not find Game Instance', 'gameInstanceSetting' => NULL];
+        }
+
+        if ($key == null) {
+            $gameInstanceSetting = GameInstanceSettings::where('game_instance_id', $gameInstance->id)->get();
+        } else {
+            $gameInstanceSetting = GameInstanceSettings::where('game_instance_id', $gameInstance->id)->where('key', $key)->first();
+            return ($gameInstanceSetting) ? $gameInstanceSetting->value : '';
+        }
+
+        if(!$gameInstanceSetting){
+            return ['status' => false, 'message' => 'Could not find Game Instance Setting', 'gameInstanceSetting' => NULL];
+        }
+        return ['status' => true, 'message' => 'Game Instance Setting found', 'gameInstanceSetting' => $gameInstanceSetting];
+    }
+
+    public static function removeGameInstanceSetting($gameToken, $key)
+    {
+        $gameInstance = GameInstances::where('token', $gameToken)->where('user_id', Auth::user()->id)->first();
+        if(!$gameInstance){
+            return ['status' => false, 'message' => 'Could not find Game Instance', 'gameInstanceSetting' => NULL];
+        }
+
+        $gameInstanceSetting = GameInstanceSettings::where('game_instance_id', $gameInstance->id)->where('key', $key)->first();
+        if(!$gameInstanceSetting){
+            return ['status' => false, 'message' => 'Could not find Game Instance Setting', 'gameInstanceSetting' => NULL];
+        }
+
+        $gameInstanceSetting->delete();
+
+        return ['status' => true, 'message' => 'Game Instance Setting removed', 'gameInstanceSetting' => $gameInstanceSetting];
+    }
+
 }

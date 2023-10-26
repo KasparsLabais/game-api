@@ -1,8 +1,13 @@
 var playerList = {};
 var gameInstance = {};
 
+let socketServer = 'https://poker-bank.com';
+if(window.location.hostname == 'localhost' || window.location.hostname == 'trivia.test') {
+    socketServer = 'http://localhost:5000';
+}
+
 //var socket = io('http://localhost:3000');
-var socket = io('https://poker-bank.com');
+var socket = io(socketServer);
 socket.on('connect', function(data) {
     console.log('connect', data);
     socket.emit('userconnected', {'username': window.username, 'id': window.id, 'avatar': window.avatar, 'playerToken' : window.playerToken });
@@ -93,5 +98,18 @@ const GameApi = {
         console.log('updatePointsUI', points);
         let pointsHolder = document.getElementById('game-api-_points-holder');
         pointsHolder.innerHTML = points;
+    },
+    'updateGameInstanceSettings' : function(gameToken, gameInstanceSettings) {
+        console.log('updateGameInstanceSettings', gameToken, gameInstanceSettings);
+        socket.emit('updateGameInstanceSettings', { 'gameToken': gameToken, 'gameInstanceSettings': gameInstanceSettings, 'playerToken': window.playerToken });
+    },
+    'updateGameInstanceSetting' : function(gameToken, $key, $value) {
+        fetch('/api/game-instance-setting', {'method': 'POST', 'body': JSON.stringify({'gameToken': gameToken, 'key': $key, 'value': $value}), 'headers': {'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content}})
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                console.log('updateGameInstanceSetting', gameToken, $key, $value);
+                socket.emit('updateGameInstanceSetting', { 'gameToken': gameToken, 'key': $key, 'value': $value, 'playerToken': window.playerToken });
+            });
     }
 }
