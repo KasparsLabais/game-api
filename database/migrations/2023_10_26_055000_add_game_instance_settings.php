@@ -13,7 +13,7 @@ class AddGameInstanceSettings extends Migration
             $table->id();
             $table->integer('game_instance_id')->unsigned();
             $table->string('key');
-            $table->string('value');
+            $table->string('value')->default('');
             $table->timestamps();
         });
     }
