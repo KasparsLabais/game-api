@@ -12,7 +12,7 @@
 
 <div class="flex w-full justify-between">
     <div class="flex flex-row md:px-12">
-        <img src="https://via.placeholder.com/65" alt="Logo">
+        <img src="/images/test-logo.png" style="height: 65px;" alt="Logo">
         <div class="flex flex-col justify-center">
             <h1 class="px-2 fira-sans">Party Games</h1>
         </div>

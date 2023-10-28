@@ -62,5 +62,6 @@
         <div>
             @include('game-api::partials.footer')
         </div>
+        @include('game-api::partials.notifications')
     </body>
 </html>

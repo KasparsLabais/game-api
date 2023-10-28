@@ -19,6 +19,9 @@ class GameApiServiceProvider extends ServiceProvider
         );
 
         Blade::component('game-api::components.points', 'points');
+        Blade::component('game-api::components.notification-success', 'notification-success');
+        Blade::component('game-api::components.notification-error', 'notification-error');
+        Blade::component('game-api::components.notification-info', 'notification-info');
     }
 
     public function register()

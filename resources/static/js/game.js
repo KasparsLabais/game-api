@@ -46,6 +46,11 @@ socket.on('notifyRoom', (data) => {
     document.dispatchEvent(new CustomEvent(data.data.action, { detail: data.data.payload }));
 });
 
+socket.on('alertNotification', (data) => {
+    console.log('alertNotification', data);
+    GameApi.displayAlertNotification(data.notificationType, data.message);
+});
+
 const GameApi = {
     'joinRoom': function(gameToken, repeatCount = 0) {
         socket.emit('joinRoom', { 'gameToken' : gameToken, 'repeatCount' : repeatCount, 'playerToken': window.playerToken}, (answer) => {
@@ -111,5 +116,29 @@ const GameApi = {
                 console.log('updateGameInstanceSetting', gameToken, $key, $value);
                 socket.emit('updateGameInstanceSetting', { 'gameToken': gameToken, 'key': $key, 'value': $value, 'playerToken': window.playerToken });
             });
+    },
+    'triggerAlertNotification' : function(gameToken, messageType, notificationType, message, playerId = 0) {
+        console.log('triggerAlertNotification', gameToken, messageType, notificationType, message);
+        socket.emit('triggerAlertNotification', { 'gameToken': gameToken, 'messageType': messageType, 'notificationType': notificationType, 'message': message, 'playerToken': window.playerToken, 'playerId' : playerId });
+    },
+    'displayAlertNotification' : function(notificationType, message) {
+        console.log('displayAlertNotification', notificationType, message);
+        let alertHolder = document.getElementById('notification-box__' + notificationType);
+        alertHolder.classList.remove('hidden');
+
+        let alertMessageHolder = document.getElementById('notification-box__' + notificationType + '__message');
+        alertMessageHolder.innerHTML = message;
+
+        setTimeout(() => {
+            GameApi.removeAlertNotification(notificationType);
+        }, 5000);
+    },
+    'removeAlertNotification' : function(notificationType) {
+        console.log('removeAlertNotification', notificationType);
+        let alertHolder = document.getElementById('notification-box__' + notificationType);
+        alertHolder.classList.add('hidden');
+
+        let alertMessageHolder = document.getElementById('notification-box__' + notificationType + '__message');
+        alertMessageHolder.innerHTML = '';
     }
 }
