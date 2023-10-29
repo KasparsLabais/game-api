@@ -52,11 +52,11 @@
             @endif
         </script>
     </head>
-    <body class="flex flex-col w-full h-screen justify-between">
+    <body class="flex flex-col w-full h-screen justify-top">
         <div>
             @include('game-api::partials.nav')
         </div>
-        <div>
+        <div class="h-screen">
             @yield('body')
         </div>
         <div>
