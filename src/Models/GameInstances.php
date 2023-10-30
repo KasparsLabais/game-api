@@ -25,4 +25,16 @@ class GameInstances extends Model
         return $this->hasMany(PlayerInstances::class, 'game_instance_id', 'id');
     }
 
+    public function gameInstanceSettings()
+    {
+        return $this->hasMany(GameInstanceSettings::class, 'game_instance_id', 'id');
+    }
+
+    public function getGameInstanceSetting($key = '') {
+        $setting = $this->gameInstanceSettings()->where('key', $key)->first();
+        if ($setting) {
+            return $setting->value;
+        }
+        return null;
+    }
 }
