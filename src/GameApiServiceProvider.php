@@ -27,6 +27,10 @@ class GameApiServiceProvider extends ServiceProvider
         Blade::component('game-api::components.ui.btn-error', 'btn-error');
         Blade::component('game-api::components.ui.btn-disabled', 'btn-disabled');
         Blade::component('game-api::components.ui.btn-alternative', 'btn-alternative');
+
+        Blade::component('game-api::components.ui.card', 'card');
+        Blade::component('game-api::components.ui.section', 'section');
+        Blade::component('game-api::components.ui.modal', 'modal');
     }
 
     public function register()
