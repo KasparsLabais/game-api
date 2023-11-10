@@ -63,5 +63,6 @@
             @include('game-api::partials.footer')
         </div>
         @include('game-api::partials.notifications')
+        <x-modal target="game-modal"></x-modal>
     </body>
 </html>

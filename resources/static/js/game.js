@@ -52,6 +52,21 @@ socket.on('alertNotification', (data) => {
 });
 
 const GameApi = {
+    'openModal': function(target, headerTitle, bodyHtml) {
+
+        let modalContent = document.querySelector(".game_modal-content[target='" + target + "']");
+
+        let modalHeader = modalContent.querySelector(".game_modal-header");
+        let modalBody = modalContent.querySelector(".game_modal-body");
+
+        modalHeader.innerHTML = headerTitle;
+        modalBody.appendChild(bodyHtml);
+
+        document.querySelector(".game_modal-holder[target='" + target + "']").classList.remove('hidden');
+    },
+    'closeModal': function(target) {
+        document.querySelector(".game_modal-holder[target='" + target + "']").classList.add('hidden');
+    },
     'joinRoom': function(gameToken, repeatCount = 0) {
         socket.emit('joinRoom', { 'gameToken' : gameToken, 'repeatCount' : repeatCount, 'playerToken': window.playerToken}, (answer) => {
             if (!answer.status && answer.repeatCount  < 10) {
