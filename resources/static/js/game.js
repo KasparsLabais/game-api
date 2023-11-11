@@ -60,6 +60,8 @@ const GameApi = {
         let modalBody = modalContent.querySelector(".game_modal-body");
 
         modalHeader.innerHTML = headerTitle;
+        modalBody.innerHTML = '';
+
         modalBody.appendChild(bodyHtml);
 
         document.querySelector(".game_modal-holder[target='" + target + "']").classList.remove('hidden');
