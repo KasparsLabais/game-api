@@ -51,6 +51,11 @@ socket.on('alertNotification', (data) => {
     GameApi.displayAlertNotification(data.notificationType, data.message);
 });
 
+socket.on('userconnected', (data) => {
+    console.log('userconnected', data);
+    document.dispatchEvent(new CustomEvent('userconnected', { detail: data }));
+});
+
 const GameApi = {
     'openModal': function(target, headerTitle, bodyHtml) {
 
