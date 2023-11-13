@@ -91,6 +91,7 @@ class GameApi
             case 'completed':
                 self::updateUserStatsWithPoints($gameToken);
                 self::closePlayerInstances($gameToken);
+                self::giveUsersGameCurrency($gameToken);
                 break;
             default:
                 break;
@@ -382,6 +383,14 @@ class GameApi
         $gameInstanceSetting->delete();
 
         return ['status' => true, 'message' => 'Game Instance Setting removed', 'gameInstanceSetting' => $gameInstanceSetting];
+    }
+
+    public static function giveUsersGameCurrency($gameToken)
+    {
+        //step 1 - collect all the players that participated the game
+        //step 2 - loop trough users
+        //step 3 - check if user have not already received currency for this game
+        //step 4 - calculate points users should receive for game (based on points and position and play time)
     }
 
 }
