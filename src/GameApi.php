@@ -424,6 +424,8 @@ class GameApi
                 'note' => 'Game Instance: ' . $gameInstance->id . ' - ' . $gameInstance->title
             ]);
         }
+
+        return true;
     }
 
     public static function getUsersGameCurrency()
