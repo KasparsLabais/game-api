@@ -9,6 +9,7 @@ use PartyGames\GameApi\Models\GameInstances;
 use PartyGames\GameApi\Models\PlayerInstances;
 use PartyGames\GameApi\Models\UserStats;
 use PartyGames\GameApi\Models\GameInstanceSettings;
+use PartyGames\GameApi\Models\GameCurrency;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -91,7 +92,6 @@ class GameApi
             case 'completed':
                 self::updateUserStatsWithPoints($gameToken);
                 self::closePlayerInstances($gameToken);
-                self::giveUsersGameCurrency($gameToken);
                 break;
             default:
                 break;
@@ -385,12 +385,50 @@ class GameApi
         return ['status' => true, 'message' => 'Game Instance Setting removed', 'gameInstanceSetting' => $gameInstanceSetting];
     }
 
-    public static function giveUsersGameCurrency($gameToken)
+    public static function giveUsersGameCurrency($gameToken, $referenceId, $referenceType, $coefficient = 0.5)
     {
         //step 1 - collect all the players that participated the game
+        $gameInstance = GameInstances::where('token', $gameToken)->where('user_id', Auth::user()->id)->first();
+        if (!$gameInstance) {
+            return false;
+        }
+        $playerInstances = PlayerInstances::where('game_instance_id', $gameInstance->id)->get();
+
         //step 2 - loop trough users
-        //step 3 - check if user have not already received currency for this game
-        //step 4 - calculate points users should receive for game (based on points and position and play time)
+        foreach ($playerInstances as $player) {
+            //step 3 - check if user have not already received currency for this game
+            $gameCurrency = GameCurrency::where('user_id', $player->user_id)->where('game_instance_id', $gameInstance->id)->first();
+            if ($gameCurrency) {
+                continue;
+            }
+
+            $gameCurrency = GameCurrency::where('user_id', $player->user_id)->where('reference_id', $referenceId)->where('reference_type', $referenceType)->first();
+            if ($gameCurrency) {
+                continue;
+            }
+
+            //step 4.a - check game instance options if there is given custom coefficient
+            $tmpCoefficient = self::getGameInstanceSettings($gameToken, 'coefficient');
+            $coefficient = ($tmpCoefficient != '') ? $tmpCoefficient : $coefficient;
+
+            //step 4 - calculate points users should receive for game (based on points and position and play time)
+            $currency = round($player->points * $coefficient);
+            //step 5 - add game currency to user
+            GameCurrency::create([
+                'type' => 'game_played',
+                'amount' => $currency,
+                'user_id' => $player->user_id,
+                'game_instance_id' => $gameInstance->id,
+                'reference_id' => $referenceId,
+                'reference_type' => $referenceType,
+                'note' => 'Game Instance: ' . $gameInstance->id . ' - ' . $gameInstance->title
+            ]);
+        }
+    }
+
+    public static function getUsersGameCurrency()
+    {
+        return GameCurrency::where('user_id', Auth::user()->id)->sum('amount');
     }
 
 }
