@@ -326,7 +326,7 @@ class GameApi
 
     public static function getPlayersTotalGamesPlayed()
     {
-        $totalGames = PlayerInstances::where('user_id', Auth::user()->id)->groupBy('game_instance_id')->count();
+        $totalGames = PlayerInstances::where('user_id', Auth::user()->id)->count();
         return $totalGames;
     }
 
