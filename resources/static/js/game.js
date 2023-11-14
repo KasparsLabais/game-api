@@ -162,5 +162,8 @@ const GameApi = {
 
         let alertMessageHolder = document.getElementById('notification-box__' + notificationType + '__message');
         alertMessageHolder.innerHTML = '';
+    },
+    'getPlayerPoints': function(gameToken) {
+        socket.emit('getPlayerPoints', { 'gameToken': gameToken, 'playerToken': window.playerToken });
     }
 }
