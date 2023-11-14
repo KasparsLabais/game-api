@@ -9,10 +9,12 @@ use Illuminate\View\Component;
 class Card extends Component
 {
     public $title = '';
+    public $addHeader = true;
 
-    public function __construct($title = '')
+    public function __construct($title = '', $addHeader = true)
     {
         $this->title = $title;
+        $this->addHeader = $addHeader;
     }
 
     public function render()
