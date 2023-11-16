@@ -44,11 +44,13 @@
                 window.id  = {!! Auth::user()->id !!};
                 window.playerToken =  '{!! Auth::user()->unique_token !!}'
                 window.avatar = @if(is_null(Auth::user()->avatar)) '/images/default-avatar.jpg' @else '{!! Auth::user()->avatar !!}' @endif;
+                window.playerType = 'player';
             @else
-                window.username = 'guest';
-                window.id = 0;
-                window.playerToken = '';
+                window.username = @if(session('tmp-user-username')) '{{ session('tmp-user-username') }}' @else  'guest' @endif;
+                window.id = @if(session('tmp-user-id')) '{{ session('tmp-user-id') }}' @else 0 @endif;
+                window.playerToken = @if(session('tmp-user-playertoken')) '{{ session('tmp-user-playertoken') }}' @else '' @endif;
                 window.avatar = '/images/default-avatar.jpg';
+                window.playerType = 'guest';
             @endif
         </script>
     </head>

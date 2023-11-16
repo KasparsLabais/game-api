@@ -3,10 +3,12 @@
 namespace PartyGames\GameApi;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use PartyGames\GameApi\Models\Game;
 use PartyGames\GameApi\Models\GameInstances;
 use PartyGames\GameApi\Models\PlayerInstances;
+use PartyGames\GameApi\Models\TmpUsers;
 use PartyGames\GameApi\Models\UserStats;
 use PartyGames\GameApi\Models\GameInstanceSettings;
 use PartyGames\GameApi\Models\GameCurrency;
@@ -107,7 +109,7 @@ class GameApi
         ]);
     }
 
-    public static function joinGameInstance($userId, $gameToken = null)
+    public static function joinGameInstance($userId, $gameToken = null, $playerType = 'player')
     {
         $gameInstance = GameInstances::where('token', $gameToken)->first();
 
@@ -121,6 +123,7 @@ class GameApi
             'points' => 0,
             'status' => 'joined',
             'remote_data' => NULL,
+            'user_type' => $playerType
         ]);
 
         if (!$playerInstance) {
@@ -177,7 +180,7 @@ class GameApi
         $winners = [];
         if ($players->where('user_id', '!=', $players->first()->user_id)->count() > 0) {
             foreach ($players->where('user_id', '!=', $players->first()->user_id) as $player) {
-                $winners[] = $player->load('user');
+                $winners[] = ($player->user_type == 'guest') ? $player->load('tmpUser') :  $player->load('user');
             }
         }
 
@@ -187,7 +190,7 @@ class GameApi
         });
 
         $response = [
-            'winner' => $players->first()->load('user'),
+            'winner' => ($players->first()->user_type == 'guest') ? $players->first()->load('tmpUser') : $players->first()->load('user'),
             'winners' => $winners
         ];
 
@@ -244,6 +247,9 @@ class GameApi
         $playerInstances = PlayerInstances::where('game_instance_id', $gameInstance->id)->get();
 
         foreach ($playerInstances as $player) {
+            if ($player->user_type == 'guest') {
+                continue;
+            }
             self::addUserStats($player->user_id, 'points', $player->points);
         }
 
@@ -397,6 +403,10 @@ class GameApi
         //step 2 - loop trough users
         foreach ($playerInstances as $player) {
             //step 3 - check if user have not already received currency for this game
+            if($player->user_type == 'guest'){
+                continue;
+            }
+            
             $gameCurrency = GameCurrency::where('user_id', $player->user_id)->where('game_instance_id', $gameInstance->id)->first();
             if ($gameCurrency) {
                 continue;
@@ -431,6 +441,17 @@ class GameApi
     public static function getUsersGameCurrency()
     {
         return GameCurrency::where('user_id', Auth::user()->id)->sum('amount');
+    }
+
+    public static function createTmpUser($username)
+    {
+        $tmpUser = TmpUsers::create([
+            'username' => $username,
+            'token' => self::createToken(15),
+            'tmp_user_id' => self::createToken(15),
+        ]);
+
+        return $tmpUser;
     }
 
 }
