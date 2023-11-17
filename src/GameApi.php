@@ -61,6 +61,7 @@ class GameApi
             'user_id' => Auth::user()->id,
             'status' => 'created',
             'token' => GameAPi::createToken(15),
+            'pin' => self::createPin(),
             'remote_data' => json_encode($remoteData)
         ]);
 
@@ -75,6 +76,17 @@ class GameApi
     {
         $gameInstance = GameInstances::where('token', $gameToken)->first();
         $gameInstance->load('user')->load('game')->load('playerInstances');
+
+        if (!$gameInstance) {
+            return ['status' => false, 'gameInstance' => NULL, 'message' => 'Could not find Game Instance'];
+        }
+
+        return ['status' => true, 'gameInstance' => $gameInstance, 'message' => 'Game Instance found'];
+    }
+
+    public static function getGameInstanceFromPin($pin = null)
+    {
+        $gameInstance = GameInstances::where('pin', $pin)->first();
 
         if (!$gameInstance) {
             return ['status' => false, 'gameInstance' => NULL, 'message' => 'Could not find Game Instance'];
@@ -147,6 +159,11 @@ class GameApi
     {
         //TODO: Check if token already exists and is active
         return Str::random(15);
+    }
+
+    public static function createPin()
+    {
+        return rand(1000, 9999);
     }
 
     public static function getPlayerInstance($gameInstanceId, $userId)
