@@ -16,4 +16,8 @@ class User extends Model
         {
             return $this->hasMany(Game::class);
         }
+
+        public function iconFlair() {
+            return $this->hasOne(IconFlairs::class, 'id', 'icon_flair_id');
+        }
 }

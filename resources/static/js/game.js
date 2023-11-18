@@ -10,7 +10,7 @@ if(window.location.hostname == 'localhost' || window.location.hostname == 'trivi
 var socket = io(socketServer);
 socket.on('connect', function(data) {
     console.log('connect', data);
-    socket.emit('userconnected', {'playerType': window.playerType, 'username': window.username, 'id': window.id, 'avatar': window.avatar, 'playerToken' : window.playerToken });
+    socket.emit('userconnected', {'playerType': window.playerType, 'username': window.username, 'id': window.id, 'avatar': window.avatar, 'playerToken' : window.playerToken, 'iconFlair': window.iconFlair });
 });
 socket.on('playerJoined', (data) => {
     console.log('playerJoined', data);
@@ -95,7 +95,7 @@ const GameApi = {
     'joinGameInstanceAsGuest': function(gameToken, redirectUrl, repeatCount = 0) {
         console.log('joinGameInstanceAsGuest', gameToken, redirectUrl, repeatCount);
         //data.id, data.username, data.avatar, data.playerToken
-        socket.emit('userReConnected', {'playerType': window.playerType, 'id': window.id, 'username' : window.username, 'avatar': window.avatar, 'playerToken': window.playerToken}, (answer) => {
+        socket.emit('userReConnected', {'playerType': window.playerType, 'id': window.id, 'username' : window.username, 'avatar': window.avatar, 'iconFlair': window.iconFlair, 'playerToken': window.playerToken}, (answer) => {
             if (!answer.status && answer.repeatCount  < 10) {
                 setTimeout(() => { console.log('Repeat'); GameApi.joinGameInstanceAsGuest(gameToken, redirectUrl, answer.repeatCount); }, 1000);
             } else {

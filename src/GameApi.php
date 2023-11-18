@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use PartyGames\GameApi\Models\Game;
 use PartyGames\GameApi\Models\GameInstances;
+use PartyGames\GameApi\Models\IconFlairs;
 use PartyGames\GameApi\Models\PlayerInstances;
 use PartyGames\GameApi\Models\TmpUsers;
+use PartyGames\GameApi\Models\User;
 use PartyGames\GameApi\Models\UserStats;
 use PartyGames\GameApi\Models\GameInstanceSettings;
 use PartyGames\GameApi\Models\GameCurrency;
@@ -471,4 +473,35 @@ class GameApi
         return $tmpUser;
     }
 
+
+    public static function getUsersIconFlair($userId = null)
+    {
+        if(is_null($userId) && !Auth::check()){
+            return null;
+        }
+
+        if(is_null($userId) && Auth::check()){
+            $userId = Auth::user()->id;
+            $flairId = Auth::user()->icon_flair_id;
+        } else {
+            $user = User::where('id', $userId)->first();
+            $flairId = $user->icon_flair_id;
+        }
+
+        return IconFlairs::where('id', $flairId)->first();
+    }
+
+    public static function getAvailableIconFlairs()
+    {
+        return IconFlairs::where('is_active', true)->get();
+    }
+
+    public static function changeIconFlair($flairId)
+    {
+        User::where('id', Auth::user()->id)->update([
+            'icon_flair_id' => $flairId,
+        ]);
+
+        return true;
+    }
 }
