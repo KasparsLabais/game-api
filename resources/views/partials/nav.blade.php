@@ -14,9 +14,9 @@
 
 <div class="flex w-full justify-between">
     <div class="flex flex-row md:px-12">
-        <img src="/images/test-logo.png" style="height: 65px;" alt="Logo">
+        <img src="/images/quizcrave2.png" style="height: 65px;" alt="Logo">
         <div class="flex flex-col justify-center">
-            <h1 class="px-2 fira-sans">Party Games</h1>
+            <h1 class="px-2 fira-sans text-xl font-semibold">Quiz Crave</h1>
         </div>
     </div>
     <div class="flex flex-row justify-center raleway">

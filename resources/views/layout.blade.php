@@ -17,7 +17,8 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@200;400;600&family=Raleway:wght@200;400;600;800&display=swap" rel="stylesheet">
+
+        <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@200;400;600&family=Josefin+Sans:wght@300;400&family=Raleway:wght@200;400;600;800&display=swap" rel="stylesheet">
 
         <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
@@ -35,6 +36,10 @@
             }
             .fira-sans {
                 font-family: 'Fira Sans', sans-serif;
+            }
+
+            .josefin-sans {
+                font-family: 'Josefin Sans', sans-serif;
             }
         </style>
 
@@ -56,8 +61,8 @@
             @endif
         </script>
     </head>
-    <body class="flex flex-col w-full h-full justify-top">
-        <div>
+    <body class="flex flex-col w-full h-full justify-top bg-zinc-800">
+        <div class="bg-yellow-500">
             @include('game-api::partials.nav')
         </div>
         <div class="min-h-screen">
