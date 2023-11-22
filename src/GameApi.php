@@ -196,12 +196,38 @@ class GameApi
     {
         $players = PlayerInstances::where('game_instance_id', $gameInstanceId)->orderBy('points', 'desc')->get();
 
+        $first = [];
+        $second = [];
+        $third = [];
         $winners = [];
-        if ($players->where('user_id', '!=', $players->first()->user_id)->count() > 0) {
-            foreach ($players->where('user_id', '!=', $players->first()->user_id) as $player) {
-                $winners[] = ($player->user_type == 'guest') ? $player->load('tmpUser') :  $player->load('user');
+
+
+        $tmpCounter = 1;
+        //if ($players->where('user_id', '!=', $players->first()->user_id)->count() > 0) {
+        foreach ($players as $player) {
+
+            if ($tmpCounter == 1) {
+                $first = ($player->user_type == 'guest') ? $player->load('tmpUser') :  $player->load('user');
+                $tmpCounter++;
+                continue;
             }
+
+            if ($tmpCounter == 2) {
+                $second = ($player->user_type == 'guest') ? $player->load('tmpUser') :  $player->load('user');
+                $tmpCounter++;
+                continue;
+            }
+
+            if ($tmpCounter == 3) {
+                $third = ($player->user_type == 'guest') ? $player->load('tmpUser') :  $player->load('user');
+                $tmpCounter++;
+                continue;
+            }
+
+            $winners[] = ($player->user_type == 'guest') ? $player->load('tmpUser') :  $player->load('user');
+            $tmpCounter++;
         }
+       // }
 
         //orders $winners by points
         usort($winners, function ($a, $b) {
@@ -209,7 +235,10 @@ class GameApi
         });
 
         $response = [
-            'winner' => ($players->first()->user_type == 'guest') ? $players->first()->load('tmpUser') : $players->first()->load('user'),
+            //'winner' => ($players->first()->user_type == 'guest') ? $players->first()->load('tmpUser') : $players->first()->load('user'),
+            'winner' => $first,
+            'second' => $second,
+            'third' => $third,
             'winners' => $winners
         ];
 
