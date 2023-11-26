@@ -533,4 +533,12 @@ class GameApi
 
         return true;
     }
+
+    public static function getLeaderboard($token)
+    {
+        $gameInstance = GameInstances::where('token', $token)->first();
+        $players = PlayerInstances::where('game_instance_id', $gameInstance['id'])->orderBy('points', 'desc')->get();
+
+        return $players;
+    }
 }
