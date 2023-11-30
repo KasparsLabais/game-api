@@ -8,4 +8,5 @@ class TmpUsers extends Model
 {
     protected $table = 'tmp_users';
     protected $fillable = ['username', 'token', 'tmp_user_id'];
+
 }

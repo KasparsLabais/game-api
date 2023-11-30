@@ -14,7 +14,8 @@ socket.on('connect', function(data) {
 });
 socket.on('playerJoined', (data) => {
     console.log('playerJoined', data);
-    playerJoined(data);
+    //playerJoined(data);
+    document.dispatchEvent(new CustomEvent('playerJoined', { detail: data }));
 });
 
 socket.on('gameInstanceUpdated', (data) => {
@@ -27,7 +28,8 @@ socket.on('gameInstanceUpdated', (data) => {
 
 socket.on('updatePoints', (data) => {
     console.log('updatePoints', data);
-    GameApi.updatePointsUI(data.points);
+    //GameApi.updatePointsUI(data.points);
+    document.dispatchEvent(new CustomEvent('updatePlayerPoints', { detail: data }));
 });
 
 socket.on('playerInstanceUpdated', (data) => {

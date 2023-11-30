@@ -16,6 +16,7 @@ use PartyGames\GameApi\Models\GameInstanceSettings;
 use PartyGames\GameApi\Models\GameCurrency;
 
 use Illuminate\Support\Facades\Auth;
+use PartyGames\TriviaGame\Models\SubmittedAnswers;
 
 class GameApi
 {
@@ -539,6 +540,23 @@ class GameApi
         $gameInstance = GameInstances::where('token', $token)->first();
         $players = PlayerInstances::where('game_instance_id', $gameInstance['id'])->orderBy('points', 'desc')->get();
 
+        foreach ($players as $player) {
+            $user = ($player->user_type == 'guest') ? $player->tmpUser : $player->user;
+            $player->username = $user['username'];
+            //$player->user = ($player->user_type == 'guest') ? $player->load('tmpUser') : $player->load('user');
+        }
+            //dd($players);
         return $players;
+    }
+    
+    public static function isFirstAnsweredCorrectlyToQuestion($gameInstanceId, $questionId, $answerId, $userId)
+    {
+        $firstCorrectAnswer = SubmittedAnswers::where('game_instance_id', $gameInstanceId)->where('question_id', $questionId)->where('answer_id', $answerId)->orderBy('created_at', 'DESC')->first();
+
+        if ($userId == $firstCorrectAnswer->user_id) {
+            return true;
+        }
+        
+        return false;
     }
 }
