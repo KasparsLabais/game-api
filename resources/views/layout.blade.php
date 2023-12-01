@@ -62,7 +62,7 @@
         </script>
     </head>
     <body class="flex flex-col w-full h-full justify-top bg-zinc-800">
-        <div class="bg-yellow-500">
+        <div class="bg-yellow-500 z-20">
             @include('game-api::partials.nav')
         </div>
         <div class="min-h-screen">
