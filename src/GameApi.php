@@ -559,4 +559,13 @@ class GameApi
         
         return false;
     }
+
+    public static function isFirstTextInputCorrectAnswer($gameInstanceId, $questionId, $correctAnswer, $userId)
+    {
+        $firstCorrectAnswer = SubmittedAnswers::where('game_instance_id', $gameInstanceId)->where('question_id', $questionId)->where('answer_custom_input', $correctAnswer)->orderBy('created_at', 'DESC')->first();
+        if ($userId == $firstCorrectAnswer->user_id) {
+            return true;
+        }
+        return false;
+    }
 }
