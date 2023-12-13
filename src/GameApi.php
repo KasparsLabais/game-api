@@ -204,28 +204,154 @@ class GameApi
 
 
         $tmpCounter = 1;
+        $tmpUser = [];
         //if ($players->where('user_id', '!=', $players->first()->user_id)->count() > 0) {
         foreach ($players as $player) {
 
             if ($tmpCounter == 1) {
-                $first = ($player->user_type == 'guest') ? $player->load('tmpUser') :  $player->load('user');
+                if($player->user_type == 'player') {
+                    $player->load('user');
+                    $player->user->load('iconFlair');
+                    $playerInstance[$player->user_id] = $player;
+
+                    $tmpUser = [
+                        'id' => $player->id,
+                        'user_id' => $player->user_id,
+                        'username' => $player->user->username,
+                        'avatar' => ($player->user->avatar) ?: '/images/default-avatar.jpg',
+                        'icon_flair' => $player->user->iconFlair->icon_url,
+                        'points' => $player->points,
+                        'user_type' => $player->user_type,
+                        'remote_data' => json_decode($player->remote_data, true),
+                    ];
+                } else {
+                    $player->load('tmpUser');
+                    //    $playerInstance[$player->user_id] = $player;
+                    $tmpUser = [
+                        'id' => $player->id,
+                        'user_id' => $player->user_id,
+                        'tmp_user_id' => $player->tmpUser->id,
+                        'username' => $player->tmpUser->username,
+                        'avatar' => '/images/default-avatar.jpg',
+                        'icon_flair' => '',
+                        'points' => $player->points,
+                        'user_type' => $player->user_type,
+                        'remote_data' => json_decode($player->remote_data, true),
+                    ];
+                }
+
+                $first = $tmpUser;// ($player->user_type == 'guest') ? $player->load('tmpUser') :  $player->load('user');
                 $tmpCounter++;
                 continue;
             }
 
             if ($tmpCounter == 2) {
-                $second = ($player->user_type == 'guest') ? $player->load('tmpUser') :  $player->load('user');
+                if($player->user_type == 'player') {
+                    $player->load('user');
+                    $player->user->load('iconFlair');
+                    $playerInstance[$player->user_id] = $player;
+
+                    $tmpUser = [
+                        'id' => $player->id,
+                        'user_id' => $player->user_id,
+                        'username' => $player->user->username,
+                        'avatar' => ($player->user->avatar) ?: '/images/default-avatar.jpg',
+                        'icon_flair' => $player->user->iconFlair->icon_url,
+                        'points' => $player->points,
+                        'user_type' => $player->user_type,
+                        'remote_data' => json_decode($player->remote_data, true),
+                    ];
+                } else {
+                    $player->load('tmpUser');
+                    //    $playerInstance[$player->user_id] = $player;
+                    $tmpUser = [
+                        'id' => $player->id,
+                        'user_id' => $player->user_id,
+                        'tmp_user_id' => $player->tmpUser->id,
+                        'username' => $player->tmpUser->username,
+                        'avatar' => '/images/default-avatar.jpg',
+                        'icon_flair' => '',
+                        'points' => $player->points,
+                        'user_type' => $player->user_type,
+                        'remote_data' => json_decode($player->remote_data, true),
+                    ];
+                }
+
+                $second = $tmpUser;//($player->user_type == 'guest') ? $player->load('tmpUser') :  $player->load('user');
                 $tmpCounter++;
                 continue;
             }
 
             if ($tmpCounter == 3) {
-                $third = ($player->user_type == 'guest') ? $player->load('tmpUser') :  $player->load('user');
+
+                if($player->user_type == 'player') {
+                    $player->load('user');
+                    $player->user->load('iconFlair');
+                    $playerInstance[$player->user_id] = $player;
+
+                    $tmpUser = [
+                        'id' => $player->id,
+                        'user_id' => $player->user_id,
+                        'username' => $player->user->username,
+                        'avatar' => ($player->user->avatar) ?: '/images/default-avatar.jpg',
+                        'icon_flair' => $player->user->iconFlair->icon_url,
+                        'points' => $player->points,
+                        'user_type' => $player->user_type,
+                        'remote_data' => json_decode($player->remote_data, true),
+                    ];
+                } else {
+                    $player->load('tmpUser');
+                    //    $playerInstance[$player->user_id] = $player;
+                    $tmpUser = [
+                        'id' => $player->id,
+                        'user_id' => $player->user_id,
+                        'tmp_user_id' => $player->tmpUser->id,
+                        'username' => $player->tmpUser->username,
+                        'avatar' => '/images/default-avatar.jpg',
+                        'icon_flair' => '',
+                        'points' => $player->points,
+                        'user_type' => $player->user_type,
+                        'remote_data' => json_decode($player->remote_data, true),
+                    ];
+                }
+
+                $third = $tmpUser;//($player->user_type == 'guest') ? $player->load('tmpUser') :  $player->load('user');
                 $tmpCounter++;
                 continue;
             }
 
-            $winners[] = ($player->user_type == 'guest') ? $player->load('tmpUser') :  $player->load('user');
+            if($player->user_type == 'player') {
+                $player->load('user');
+                $player->user->load('iconFlair');
+                $playerInstance[$player->user_id] = $player;
+
+                $tmpUser = [
+                    'id' => $player->id,
+                    'user_id' => $player->user_id,
+                    'username' => $player->user->username,
+                    'avatar' => ($player->user->avatar) ?: '/images/default-avatar.jpg',
+                    'icon_flair' => $player->user->iconFlair->icon_url,
+                    'points' => $player->points,
+                    'user_type' => $player->user_type,
+                    'remote_data' => json_decode($player->remote_data, true),
+                ];
+            } else {
+                $player->load('tmpUser');
+                //    $playerInstance[$player->user_id] = $player;
+                $tmpUser = [
+                    'id' => $player->id,
+                    'user_id' => $player->user_id,
+                    'tmp_user_id' => $player->tmpUser->id,
+                    'username' => $player->tmpUser->username,
+                    'avatar' => '/images/default-avatar.jpg',
+                    'icon_flair' => '',
+                    'points' => $player->points,
+                    'user_type' => $player->user_type,
+                    'remote_data' => json_decode($player->remote_data, true),
+                ];
+            }
+
+            $winners[] = $tmpUser;//($player->user_type == 'guest') ? $player->load('tmpUser') :  $player->load('user');
             $tmpCounter++;
         }
        // }
