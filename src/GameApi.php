@@ -502,7 +502,9 @@ class GameApi
             foreach ($users as $user) {
                 //$user['icon_flair'] = self::getUsersIconFlair($user['user_id']);
                 if ( $user['user_type'] == 'guest') {
-                    $user['user'] = $user->tmpUser;
+                    $tmpUser = TmpUsers::where('id', $user['user_id'])->first();
+                    $user['user'] = $tmpUser;
+                    ///$user['user'] = $user->load('tmpUser');
                 }
             }
 
