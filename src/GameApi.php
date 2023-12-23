@@ -497,21 +497,49 @@ class GameApi
         $allOpenGameInstances = GameInstances::where('status', '!=', 'completed')->get();
         foreach ($allOpenGameInstances as $game) {
 
-            $users = $game->playerInstances->load('user')->toArray();
+            $playerInstances = $game->playerInstances;//->load('user')->toArray();
 
+            foreach ($playerInstances as $plInstance) {
+                if ( $plInstance['user_type'] == 'guest') {
+                    $tmpUser = TmpUsers::where('tmp_user_id', $plInstance['user_id'])->first();
+                    //dd($tmpUser);
+                    //$user['user'] = $tmpUser;}
+                    ///$user['user'] = $user->load('tmpUser');
+                    // update user array with tmp user data
+                    $plInstance['user'] = $tmpUser;
+                    //dd( $user );
+                }
+
+                if ( $plInstance['user_type'] == 'player') {
+                    $user = User::where('id', $plInstance['user_id'])->first();
+                    $user->load('iconFlair');
+                    $plInstance['user'] = $user;
+                }
+            }
+
+/*
+
+           dd($playerInstances);
+//dd($users);
             foreach ($users as $user) {
                 //$user['icon_flair'] = self::getUsersIconFlair($user['user_id']);
                 if ( $user['user_type'] == 'guest') {
-                    $tmpUser = TmpUsers::where('id', $user['user_id'])->first();
-                    $user['user'] = $tmpUser;
+                    $tmpUser = TmpUsers::where('tmp_user_id', $user['user_id'])->first();
+                    //dd($tmpUser);
+                    //$user['user'] = $tmpUser;}
                     ///$user['user'] = $user->load('tmpUser');
+                    // update user array with tmp user data
+                    $user['user'] = $tmpUser;
+                    //dd( $user );
                 }
             }
+*/
+           // dd($users);
 
 
             $returnObject[] = [
                 'game' => $game->toArray(),
-                'players' => $game->playerInstances->load('user')->toArray()
+                'players' => $playerInstances//$game->playerInstances->load('user')->toArray()
             ];
         }
 
