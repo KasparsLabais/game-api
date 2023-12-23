@@ -496,6 +496,17 @@ class GameApi
 
         $allOpenGameInstances = GameInstances::where('status', '!=', 'completed')->get();
         foreach ($allOpenGameInstances as $game) {
+
+            $users = $game->playerInstances->load('user')->toArray();
+
+            foreach ($users as $user) {
+                //$user['icon_flair'] = self::getUsersIconFlair($user['user_id']);
+                if ( $user['user_type'] == 'guest') {
+                    $user['user'] = $user->tmpUser;
+                }
+            }
+
+
             $returnObject[] = [
                 'game' => $game->toArray(),
                 'players' => $game->playerInstances->load('user')->toArray()
