@@ -355,7 +355,7 @@ class GameApi
             $tmpCounter++;
         }
        // }
-
+dd($winners);
         //orders $winners by points
         usort($winners, function ($a, $b) {
             return $a->points <= $b->points;
