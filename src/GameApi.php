@@ -360,7 +360,7 @@ class GameApi
         usort($winners, function ($a, $b) {
             return $a['points'] <= $b['points'];
         });
-
+dd($winners);
         $response = [
             //'winner' => ($players->first()->user_type == 'guest') ? $players->first()->load('tmpUser') : $players->first()->load('user'),
             'winner' => $first,
