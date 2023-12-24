@@ -358,7 +358,7 @@ class GameApi
 //dd($winners);
         //orders $winners by points
         usort($winners, function ($a, $b) {
-            return $a->points <= $b->points;
+            return $a['points'] <= $b['points'];
         });
 
         $response = [
