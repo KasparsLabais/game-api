@@ -26,8 +26,8 @@
         <!-- Stylesheets -->
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
         <!-- Scripts -->
-        <script src="{{ asset('js/app.js') }}" defer></script>
-        <script src="{{ asset('/vendor/game-api/js/game.js') }}?202310112030"></script>
+        <script src="{{ asset('js/app.js') }}?202312251030" defer></script>
+        <script src="{{ asset('/vendor/game-api/js/game.js') }}?202312251030"></script>
 
 
         <style>
