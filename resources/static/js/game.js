@@ -155,6 +155,20 @@ const GameApi = {
                 socket.emit('updateGameInstanceSetting', { 'gameToken': gameToken, 'key': $key, 'value': $value, 'playerToken': window.playerToken });
             });
     },
+    'updateGameMainGameInstanceSetting' : function(gameToken, key, value) {
+
+        let action = 'updateGameInstanceStatus'
+
+        fetch('/api/game-instance', {'method': 'POST', 'body': JSON.stringify({'gameToken': gameToken, 'key': key, 'value': value}), 'headers': {'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content}})
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if(data.success) {
+                    console.log('updateGameInstance', gameToken, data.gameInstance);
+                    socket.emit('updateGameInstance', { 'gameToken': gameToken, 'gameInstance': data.gameInstance, 'action': action, 'playerToken': window.playerToken});
+                }
+            })
+    },
     'triggerAlertNotification' : function(gameToken, messageType, notificationType, message, playerId = 0) {
         console.log('triggerAlertNotification', gameToken, messageType, notificationType, message);
         socket.emit('triggerAlertNotification', { 'gameToken': gameToken, 'messageType': messageType, 'notificationType': notificationType, 'message': message, 'playerToken': window.playerToken, 'playerId' : playerId });

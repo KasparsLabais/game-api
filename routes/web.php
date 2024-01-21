@@ -7,3 +7,4 @@ Route::get('/api/points', 'BaseController@getPlayersPoints');
 Route::get('/api/games', 'BaseController@getAllGames');
 
 Route::post('/api/game-instance-setting', 'BaseController@addGameInstanceSetting');
+Route::post('/api/game-instance', 'BaseController@editGameInstance');

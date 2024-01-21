@@ -50,4 +50,19 @@ class BaseController
         ]);
     }
 
+    public function editGameInstance(Request $request)
+    {
+        $gameToken = $request->get('gameToken');
+
+        $key = $request->get('key');
+        $value = $request->get('value');
+
+        $response = GameApi::editGameInstance($gameToken, $key, $value);
+        return response()->json([
+            'success' => true,
+            'message' => $response['message'],
+            'gameInstance' => $response['gameInstance']
+        ]);
+    }
+
 }

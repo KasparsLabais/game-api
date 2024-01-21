@@ -113,8 +113,16 @@ class GameApi
             default:
                 break;
         }
-
         return ['status' => true, 'gameInstance' => $gameInstance, 'message' => 'Game Instance status changed'];
+    }
+
+    public static function editGameInstance($gameToken, $key, $value)
+    {
+        GameInstances::where('token', $gameToken)->where('user_id', Auth::user()->id)->update([
+            $key => $value,
+        ]);
+        $gameInstance = GameInstances::where('token', $gameToken)->first();
+        return ['status' => true, 'gameInstance' => $gameInstance, 'message' => "Game Instance {$key} changed to {$value}"];
     }
 
     public static function updateGameInstanceRemoteData($gameToken, $remoteData)
