@@ -10,7 +10,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <!-- Tailwind -->
-        <script src="https://cdn.tailwindcss.com"></script>
+        <!--<script src="https://cdn.tailwindcss.com"></script>-->
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -25,6 +25,7 @@
 
         <!-- Stylesheets -->
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+        <!--<link rel="stylesheet" href="{{ asset('/vendor/game-api/css/game-api.css') }}?202411101050">-->
         <!-- Scripts -->
         <script src="{{ asset('js/app.js') }}?202312251030" defer></script>
         <script src="{{ asset('/vendor/game-api/js/game.js') }}?202312251030"></script>
@@ -61,8 +62,8 @@
             @endif
         </script>
     </head>
-    <body class="flex flex-col w-full h-full justify-top bg-zinc-800">
-        <div class="bg-yellow-500 z-20">
+    <body class="flex flex-col w-full h-full justify-top bg-main-dark">
+        <div class="bg-main-dark text-alternative-accent z-20">
             @include('game-api::partials.nav')
         </div>
         <div class="min-h-screen">

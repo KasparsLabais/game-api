@@ -1,0 +1,60 @@
+/*
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.bg-main-dark {
+    background-color: #030F19;
+}
+
+.bg-secondly-dark {
+    background-color: #503B33;
+}
+
+.bg-main-light {
+    background-color: #588273;
+}
+
+.bg-main-accent {
+    background-color: #FB7806;
+}
+
+.bg-secondly-accent {
+    background-color: #CA4410;
+}
+
+.bg-alternative-accent {
+    background-color: #F2A44C;
+}
+
+.bg-content {
+    background-color: #ebebeb;
+}
+
+.text-main-color {
+    color: #030F19;
+}
+
+.text-secondly-color {
+    color: #503B33;
+}
+
+.text-main-light {
+    color: #588273;
+}
+
+.text-main-accent {
+    color: #FB7806;
+}
+
+.text-secondly-accent {
+    color: #CA4410;
+}
+
+.text-alternative-accent {
+    color: #F2A44C;
+}
+
+*/
+
