@@ -66,7 +66,7 @@
         <div class="bg-main-dark text-alternative-accent z-20">
             @include('game-api::partials.nav')
         </div>
-        <div class="min-h-screen">
+        <div class="min-h-screen bg-main-light">
             @yield('body')
         </div>
         <div>
