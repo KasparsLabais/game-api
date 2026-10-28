@@ -49,6 +49,11 @@
         function show(from, message, level, colour) {
             var look = LEVELS[level] || LEVELS.custom;
 
+            // Sit above the friends envelope when it shares the corner.
+            var friends = document.getElementById('friends-widget');
+            stack.classList.toggle('bottom-28', !!friends);
+            stack.classList.toggle('bottom-4', !friends);
+
             var toast = document.createElement('div');
             toast.className = 'game-toast pointer-events-auto w-full bg-white border-4 border-main-dark shadow-[6px_6px_0_0_#14323B] overflow-hidden';
             toast.setAttribute('role', level === 'fatal' ? 'alert' : 'status');
