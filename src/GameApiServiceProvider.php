@@ -37,6 +37,8 @@ class GameApiServiceProvider extends ServiceProvider
 
     public function register()
     {
+        $this->mergeConfigFrom(__DIR__ . '/../config/game-api.php', 'game-api');
+
         $this->app->bind('game-api', function() {
             return new GameApi;
         });

@@ -1,8 +1,9 @@
 <div class="flex flex-col">
     @if($addHeader)
-    <div class="flex flex-col px-2 py-2 bg-yellow-400 shadow">
-        <h1 class="bg-slate-200  py-2 px-2 raleway text-lg">{{ $title }}</h1>
-    </div>
+    <h2 class="relative self-start inline-block mt-2 mb-6">
+        <span aria-hidden="true" class="absolute inset-0 -rotate-2 bg-green-300"></span>
+        <span class="relative block russo text-main-dark text-sm md:text-lg tracking-widest uppercase px-4 py-1.5">{{ $title }}</span>
+    </h2>
     @endif
     <div class="w-full flex flex-col raleway @if($addHeader) py-2 px-2 @endif ">
         {{ $slot }}

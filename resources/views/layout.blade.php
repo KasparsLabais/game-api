@@ -18,30 +18,29 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-        <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@200;400;600&family=Josefin+Sans:wght@300;400&family=Raleway:wght@200;400;600;800&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Honk&family=Russo+One&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 
         <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
-        <!-- Stylesheets -->
-        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-        <!--<link rel="stylesheet" href="{{ asset('/vendor/game-api/css/game-api.css') }}?202411101050">-->
+        <!-- Compiled Tailwind CSS + app JS (built from trivia/resources via Vite) -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
         <!-- Scripts -->
-        <script src="{{ asset('js/app.js') }}?202312251030" defer></script>
+        <script>window.socketServer = '{{ config('game-api.socket_url') }}';</script>
         <script src="{{ asset('/vendor/game-api/js/game.js') }}?202312251030"></script>
 
 
         <style>
-            .raleway {
-                font-family: 'Raleway', sans-serif;
-            }
-            .fira-sans {
-                font-family: 'Fira Sans', sans-serif;
-            }
-
-            .josefin-sans {
-                font-family: 'Josefin Sans', sans-serif;
-            }
+            /* Brand typography (2026-10, retro/neo-brutalist): Honk = title only,
+               Space Grotesk = headings, Space Mono = body, Russo One = arcade
+               accents. Legacy class names are repointed so existing views pick
+               up the new fonts without edits. */
+            body { font-family: 'Space Mono', ui-monospace, monospace; }
+            .raleway { font-family: 'Space Mono', ui-monospace, monospace; }
+            .fira-sans { font-family: 'Space Grotesk', ui-sans-serif, sans-serif; }
+            .josefin-sans { font-family: 'Space Grotesk', ui-sans-serif, sans-serif; }
+            .honk { font-family: 'Honk', system-ui, cursive; font-weight: 400; }
+            .russo { font-family: 'Russo One', ui-sans-serif, sans-serif; }
         </style>
 
         <script>
@@ -62,17 +61,20 @@
             @endif
         </script>
     </head>
-    <body class="flex flex-col w-full h-full justify-top bg-main-dark">
-        <div class="bg-main-dark text-alternative-accent z-20">
-            @include('game-api::partials.nav')
+    <body class="flex flex-col w-full h-full justify-top @yield('page-bg', 'bg-main-light')">
+        {{-- Nav as its own floating block: padded from the sides and top/bottom so
+             it doesn't merge with the page edges. --}}
+        <div class="px-[15px] lg:px-[30px] pt-2.5 pb-2.5">
+            <div class="relative bg-brand text-white z-30 border-4 border-main-dark shadow-[6px_6px_0_0_#14323B]">
+                @include('game-api::partials.nav')
+            </div>
         </div>
-        <div class="min-h-screen bg-main-light">
+        <div class="min-h-screen">
             @yield('body')
         </div>
-        <div>
-            @include('game-api::partials.footer')
-        </div>
+        @include('game-api::partials.footer')
         @include('game-api::partials.notifications')
+        @include('game-api::partials.friends')
         <x-modal target="game-modal"></x-modal>
     </body>
 </html>

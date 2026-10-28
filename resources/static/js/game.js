@@ -1,13 +1,14 @@
 var playerList = {};
 var gameInstance = {};
 
-let socketServer = 'https://poker-bank.com';
-if(window.location.hostname == 'localhost' || window.location.hostname == 'trivia.test') {
-    socketServer = 'http://localhost:5000';
-}
+// Injected by the server (config game-api.socket_url / GAME_SOCKET_URL).
+// Fall back to the current host on :5001 if it wasn't set for some reason.
+let socketServer = window.socketServer || (window.location.protocol + '//' + window.location.hostname + ':5001');
 
-//var socket = io('http://localhost:3000');
 var socket = io(socketServer);
+// Expose the connection so self-contained widgets (e.g. the online-users badge
+// and the friends panel) can reuse it instead of opening a second socket.
+window.socket = socket;
 socket.on('connect', function(data) {
     console.log('connect', data);
     socket.emit('userconnected', {'playerType': window.playerType, 'username': window.username, 'id': window.id, 'avatar': window.avatar, 'playerToken' : window.playerToken, 'iconFlair': window.iconFlair });
@@ -136,6 +137,21 @@ const GameApi = {
     'notifyRoom': function(gameToken, data) {
         console.log('notifyRoom', gameToken, data);
         socket.emit('notifyRoom', { 'gameToken': gameToken, 'data': data, 'playerToken': window.playerToken });
+    },
+    'gameMasterNotify': function(gameToken, target, data, callback) {
+        console.log('gameMasterNotify', gameToken, target, data);
+        socket.emit('gameMasterNotify', { 'gameToken': gameToken, 'target': target, 'data': data, 'playerToken': window.playerToken }, callback);
+    },
+    'startQuestionTimer': function(gameToken, questionData, timeLimit) {
+        console.log('startQuestionTimer', gameToken, timeLimit);
+        socket.emit('startQuestionTimer', { 'gameToken': gameToken, 'questionData': questionData, 'timeLimit': timeLimit, 'playerToken': window.playerToken });
+    },
+    'getQuestionTimer': function(gameToken, callback) {
+        socket.emit('getQuestionTimer', { 'gameToken': gameToken }, callback);
+    },
+    'clearQuestionTimer': function(gameToken) {
+        console.log('clearQuestionTimer', gameToken);
+        socket.emit('clearQuestionTimer', { 'gameToken': gameToken });
     },
     'updatePointsUI': function(points) {
         console.log('updatePointsUI', points);
