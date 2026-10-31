@@ -4,72 +4,115 @@
     game-api::layout (it provides socket.io, window.socket from game.js, the CSRF
     meta tag and window.id/username for the authenticated user).
 
-    - Floating button (bottom-right) shows how many friends are online.
-    - Click to open a panel listing friends (online first) + an "Add friend"
-      search. Click a friend to open a chat window and exchange private messages.
+    Neo-brutalist "old school mail":
+    - Floating envelope (bottom-right). A bookmark ribbon shows how many friends
+      are live; a sticky note is attached when there are unread messages.
+    - Click to open a mail client: "Inbox" (friends by most recent message, with
+      a preview) and "Online" folders, plus "+ Add contact" search.
+    - Click a friend to open the conversation as a message-board thread.
     - Delivery is real-time via the node; every message is persisted by the
       Laravel app first, so history survives a node restart.
 --}}
 @auth
+<style>
+    #friends-toggle:hover .friends-envelope { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 0 #14323B; }
+    #friends-toggle:active .friends-envelope { transform: translate(3px, 3px); box-shadow: 0 0 0 0 #14323B; }
+    .friends-note-in { animation: friends-note-in 0.4s cubic-bezier(.2, 1.6, .4, 1) both; }
+    @keyframes friends-note-in { from { opacity: 0; transform: rotate(30deg) scale(0.4); } to { opacity: 1; transform: rotate(8deg) scale(1); } }
+    @media (prefers-reduced-motion: reduce) { .friends-note-in { animation: none; } }
+</style>
+
 <div id="friends-widget" class="fixed bottom-4 right-4 z-50 fira-sans" data-me="{{ Auth::id() }}">
 
-    {{-- Floating toggle button --}}
-    <button id="friends-toggle" type="button"
-            class="relative flex items-center gap-2 rounded-full bg-main-dark px-4 py-2 text-sm text-alternative-accent shadow-lg ring-1 ring-alternative-accent hover:ring-main-accent transition">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-            <path d="M8.25 6.75a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM15.75 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM2.25 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM6.31 15.117A6.745 6.745 0 0 1 12 12a6.745 6.745 0 0 1 6.709 7.498.75.75 0 0 1-.372.568A12.696 12.696 0 0 1 12 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 0 1-.372-.568 6.787 6.787 0 0 1 1.019-4.38Z"/>
-            <path d="M5.082 14.254a8.287 8.287 0 0 0-1.308 5.135 9.687 9.687 0 0 1-1.764-.44l-.115-.04a.563.563 0 0 1-.373-.487l-.01-.121a3.75 3.75 0 0 1 3.57-4.047ZM20.226 19.389a8.287 8.287 0 0 0-1.308-5.135 3.75 3.75 0 0 1 3.57 4.047l-.01.121a.563.563 0 0 1-.373.486l-.115.04c-.567.2-1.156.349-1.764.441Z"/>
-        </svg>
-        <span><span id="friends-online-count">0</span> friends online</span>
-        <span id="friends-unread-dot" class="hidden absolute -top-1 -right-1 flex h-3 w-3">
-            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-500 opacity-75"></span>
-            <span class="relative inline-flex h-3 w-3 rounded-full bg-rose-600"></span>
+    {{-- Floating envelope --}}
+    <button id="friends-toggle" type="button" aria-label="Friends and messages" aria-expanded="false"
+            class="relative block pt-4 pr-4">
+        <span class="friends-envelope relative block w-20 h-14 bg-white border-4 border-main-dark shadow-[5px_5px_0_0_#14323B] transition-all duration-100">
+            {{-- Flap --}}
+            <svg class="absolute inset-0 w-full h-full" viewBox="0 0 72 48" preserveAspectRatio="none" aria-hidden="true">
+                <polyline points="0,0 36,28 72,0" fill="none" stroke="#14323B" stroke-width="4" stroke-linejoin="miter"/>
+                <polyline points="0,48 28,22" fill="none" stroke="#14323B" stroke-width="2"/>
+                <polyline points="72,48 44,22" fill="none" stroke="#14323B" stroke-width="2"/>
+            </svg>
+        </span>
+
+        {{-- Bookmark ribbon: friends live --}}
+        <span id="friends-online-bookmark" class="hidden absolute top-1 left-2 w-7 h-10" title="Friends online">
+            <svg class="absolute inset-0 w-full h-full" viewBox="0 0 28 40" aria-hidden="true">
+                <polygon points="1,1 27,1 27,39 14,30 1,39" fill="#1E93AB" stroke="#14323B" stroke-width="2"/>
+            </svg>
+            <span id="friends-online-count" class="relative block text-center russo text-white text-sm leading-none pt-2">0</span>
+        </span>
+
+        {{-- Sticky note: unread messages --}}
+        <span id="friends-unread-note" class="hidden absolute -top-1 right-0 w-11 h-11 bg-pop border-2 border-main-dark shadow-[3px_3px_0_0_#14323B] rotate-[8deg] flex-col items-center justify-center" title="New messages">
+            <span class="absolute -top-2 left-1/2 -translate-x-1/2 w-6 h-2.5 bg-white/80 border border-main-dark/40 -rotate-6" aria-hidden="true"></span>
+            <span id="friends-unread-count" class="russo text-main-dark text-base leading-none">0</span>
+            <span class="fira-sans text-[9px] font-bold uppercase text-main-dark leading-none mt-0.5">new</span>
         </span>
     </button>
 
-    {{-- Panel --}}
-    <div id="friends-panel" class="hidden absolute bottom-14 right-0 w-80 max-w-[90vw] rounded-lg bg-main-light shadow-2xl ring-1 ring-black/10 overflow-hidden">
+    {{-- Mail client window --}}
+    <div id="friends-panel" class="hidden absolute bottom-20 right-0 w-[23rem] max-w-[calc(100vw-2rem)] bg-white border-4 border-main-dark shadow-[8px_8px_0_0_#14323B] overflow-hidden">
 
-        {{-- LIST VIEW --}}
+        {{-- Title bar --}}
+        <div class="flex items-center gap-2 bg-main-dark px-3 py-2">
+            <span class="w-3 h-3 rounded-full bg-main-accent shrink-0"></span>
+            <span class="w-3 h-3 rounded-full bg-pop shrink-0"></span>
+            <span class="w-3 h-3 rounded-full bg-green-500 shrink-0"></span>
+            <span id="friends-panel-title" class="ml-1 russo uppercase tracking-widest text-white text-xs truncate">Mail</span>
+            <button id="friends-close" type="button" aria-label="Close" class="ml-auto shrink-0 w-6 h-6 flex items-center justify-center border-2 border-white/60 text-white hover:bg-white/10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+            </button>
+        </div>
+
+        {{-- INBOX VIEW --}}
         <div id="friends-list-view">
-            <div class="flex items-center justify-between bg-main-dark px-4 py-3">
-                <h3 class="text-alternative-accent font-semibold">Friends</h3>
-                <button id="friends-add-toggle" type="button" class="text-xs font-semibold text-main-dark bg-main-accent rounded px-2 py-1 hover:opacity-90">+ Add</button>
+            {{-- Toolbar: folders + add contact --}}
+            <div class="flex items-stretch border-b-4 border-main-dark bg-surface">
+                <button type="button" data-folder="inbox" class="friends-folder px-3 py-2 russo text-xs uppercase tracking-wide border-r-4 border-main-dark">
+                    Inbox <span id="friends-inbox-count" class="hidden ml-1 bg-main-accent text-white px-1.5"></span>
+                </button>
+                <button type="button" data-folder="online" class="friends-folder px-3 py-2 russo text-xs uppercase tracking-wide border-r-4 border-main-dark">
+                    Online <span id="friends-online-folder-count" class="ml-1 text-main-dark/50">0</span>
+                </button>
+                <button id="friends-add-toggle" type="button" class="ml-auto px-3 py-2 russo text-xs uppercase tracking-wide bg-pop border-l-4 border-main-dark hover:bg-white">+ Add</button>
             </div>
 
-            {{-- Add-friend search (hidden by default) --}}
-            <div id="friends-add-box" class="hidden border-b border-slate-300 px-3 py-2 bg-white">
-                <div class="flex gap-2">
-                    <input id="friends-search-input" type="text" placeholder="Search username…"
-                           class="flex-1 border border-slate-300 rounded px-2 py-1 text-sm">
-                </div>
+            {{-- Add-contact search (hidden by default) --}}
+            <div id="friends-add-box" class="hidden border-b-4 border-main-dark px-3 py-3 bg-white">
+                <label for="friends-search-input" class="block fira-sans text-[10px] uppercase tracking-widest text-main-dark/60 mb-1">To:</label>
+                <input id="friends-search-input" type="text" placeholder="Search username…" autocomplete="off"
+                       class="w-full bg-white border-2 border-main-dark px-2 py-1.5 text-sm text-main-dark font-bold focus:outline-none focus:shadow-[3px_3px_0_0_#14323B]">
                 <div id="friends-search-results" class="mt-2 flex flex-col gap-1 max-h-40 overflow-y-auto"></div>
             </div>
 
-            <div id="friends-list" class="max-h-80 overflow-y-auto divide-y divide-slate-200">
-                <p id="friends-empty" class="text-slate-500 text-sm text-center py-6 px-4">No friends yet. Use “+ Add” to find people.</p>
+            <div id="friends-list" class="max-h-80 overflow-y-auto">
+                <p id="friends-empty" class="fira-sans text-main-dark/60 text-sm text-center py-8 px-4"></p>
             </div>
         </div>
 
-        {{-- CHAT VIEW --}}
-        <div id="friends-chat-view" class="hidden flex flex-col h-96">
-            <div class="flex items-center gap-2 bg-main-dark px-3 py-2">
-                <button id="friends-chat-back" type="button" class="text-alternative-accent hover:text-main-accent">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-                    </svg>
-                </button>
-                <img id="friends-chat-avatar" src="/images/default-avatar.jpg" class="w-8 h-8 rounded-full border border-slate-500 object-cover">
-                <div class="flex flex-col leading-tight">
-                    <span id="friends-chat-name" class="text-alternative-accent text-sm font-semibold">—</span>
-                    <span id="friends-chat-status" class="text-xs text-slate-400">offline</span>
+        {{-- THREAD VIEW (message board) --}}
+        <div id="friends-chat-view" class="hidden flex flex-col h-[28rem] max-h-[70vh]">
+            <div class="flex items-center gap-2 px-3 py-2 bg-main-light border-b-4 border-main-dark">
+                <button id="friends-chat-back" type="button" aria-label="Back to inbox"
+                        class="shrink-0 px-2 py-1 border-2 border-main-dark bg-white russo text-[10px] uppercase tracking-wide hover:bg-pop">&laquo; Inbox</button>
+                <img id="friends-chat-avatar" src="/images/default-avatar.jpg" alt="" class="w-8 h-8 border-2 border-main-dark object-cover shrink-0">
+                <div class="flex flex-col leading-tight min-w-0">
+                    <span class="fira-sans text-[10px] uppercase tracking-widest text-main-dark/60">Thread with</span>
+                    <span id="friends-chat-name" class="fira-sans text-sm font-bold text-main-dark truncate">—</span>
                 </div>
+                <span id="friends-chat-status" class="ml-auto shrink-0 border-2 border-main-dark px-1.5 py-0.5 russo text-[10px] uppercase tracking-wide">offline</span>
             </div>
-            <div id="friends-chat-messages" class="flex-1 overflow-y-auto px-3 py-3 bg-white flex flex-col gap-2"></div>
-            <div class="flex gap-2 border-t border-slate-300 p-2 bg-main-light">
-                <input id="friends-chat-input" type="text" maxlength="2000" placeholder="Type a message…"
-                       class="flex-1 border border-slate-300 rounded px-3 py-2 text-sm" autocomplete="off">
-                <button id="friends-chat-send" type="button" class="bg-main-accent text-white rounded px-4 py-2 text-sm font-semibold hover:opacity-90">Send</button>
+            <div id="friends-chat-messages" class="flex-1 overflow-y-auto px-3 py-3 bg-main-light flex flex-col gap-3"></div>
+            <div class="border-t-4 border-main-dark p-2 bg-white flex flex-col gap-2">
+                <textarea id="friends-chat-input" rows="2" maxlength="2000" placeholder="Write a reply…"
+                          class="w-full resize-none bg-white border-2 border-main-dark px-2 py-1.5 text-sm text-main-dark focus:outline-none focus:shadow-[3px_3px_0_0_#14323B]"></textarea>
+                <div class="flex items-center gap-2">
+                    <span class="fira-sans text-[10px] text-main-dark/50">Enter to post &middot; Shift+Enter for a new line</span>
+                    <button id="friends-chat-send" type="button"
+                            class="ml-auto bg-main-accent text-white border-2 border-main-dark shadow-[3px_3px_0_0_#14323B] px-4 py-1.5 russo text-xs uppercase tracking-wide transition-all duration-100 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#14323B] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none">Post reply</button>
+                </div>
             </div>
         </div>
     </div>
@@ -87,10 +130,12 @@
     var CSRF = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
 
     var state = {
-        friends: [],            // [{id, username, avatar}]
+        friends: [],            // [{id, username, avatar, last_message}]
         online: {},             // id -> true
         unread: {},             // id -> count
-        activeFriendId: null,   // open chat
+        activeFriendId: null,   // open thread
+        folder: 'inbox',        // 'inbox' | 'online'
+        unreadShown: 0,         // for the sticky-note entrance animation
         open: false
     };
 
@@ -103,12 +148,37 @@
         opts.credentials = 'same-origin';
         return fetch(url, opts).then(function (r) { return r.json(); }).catch(function () { return { success: false }; });
     }
+    function pad(n) { return n.toString().padStart(2, '0'); }
     function fmtTime(iso) {
-        try { var d = new Date(iso); return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0'); }
+        try { var d = new Date(iso); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
         catch (e) { return ''; }
+    }
+    // Inbox column: time for today, otherwise "12 Oct".
+    function fmtInboxDate(iso) {
+        try {
+            var d = new Date(iso), now = new Date();
+            if (d.toDateString() === now.toDateString()) return fmtTime(iso);
+            return d.getDate() + ' ' + d.toLocaleString('en', { month: 'short' });
+        } catch (e) { return ''; }
+    }
+    // Board post header: "12 Oct 2026, 14:05".
+    function fmtPostDate(iso) {
+        try {
+            var d = new Date(iso);
+            return d.getDate() + ' ' + d.toLocaleString('en', { month: 'short' }) + ' ' + d.getFullYear() + ', ' + fmtTime(iso);
+        } catch (e) { return ''; }
     }
     function totalUnread() {
         var t = 0; for (var k in state.unread) { t += state.unread[k] || 0; } return t;
+    }
+    function onlineCount() {
+        var n = 0; for (var k in state.online) { if (state.online[k]) n++; } return n;
+    }
+    function avatarImg(src, cls) {
+        var img = document.createElement('img');
+        img.src = src || '/images/default-avatar.jpg'; img.alt = ''; img.className = cls;
+        img.onerror = function () { this.onerror = null; this.src = '/images/default-avatar.jpg'; };
+        return img;
     }
 
     // ---------- socket (reuse game.js connection) ----------
@@ -123,9 +193,12 @@
             if (state.activeFriendId) updateChatStatus();
         });
     }
+    // Bookmark ribbon on the envelope + "Online" folder count.
     function updateOnlineCount() {
-        var n = 0; for (var k in state.online) { if (state.online[k]) n++; }
-        el('friends-online-count').textContent = n;
+        var n = onlineCount();
+        el('friends-online-count').textContent = n > 99 ? '99+' : n;
+        el('friends-online-bookmark').classList.toggle('hidden', n === 0);
+        el('friends-online-folder-count').textContent = n;
     }
     // Tell the node "I'm online" so it can notify my online friends I went live.
     // Safe to call repeatedly — the node throttles per user (5 min while testing).
@@ -152,70 +225,131 @@
         return jsonFetch('/friends/unread').then(function (res) {
             state.unread = (res && res.success) ? (res.data || {}) : {};
             renderFriends();
-            updateUnreadDot();
+            updateUnreadNote();
         });
     }
-    function updateUnreadDot() {
-        el('friends-unread-dot').classList.toggle('hidden', totalUnread() === 0);
+    // Sticky note on the envelope + Inbox folder badge.
+    function updateUnreadNote() {
+        var n = totalUnread();
+        var note = el('friends-unread-note');
+        el('friends-unread-count').textContent = n > 99 ? '99+' : n;
+        note.classList.toggle('hidden', n === 0);
+        note.classList.toggle('flex', n > 0);
+        if (n > state.unreadShown) {
+            // Re-run the "slap it on" animation when new mail arrives.
+            note.classList.remove('friends-note-in'); void note.offsetWidth; note.classList.add('friends-note-in');
+        }
+        state.unreadShown = n;
+        var badge = el('friends-inbox-count');
+        badge.textContent = n;
+        badge.classList.toggle('hidden', n === 0);
+    }
+    function setLastMessage(friendId, message, mine, iso) {
+        var f = friendById(friendId);
+        if (f) { f.last_message = { message: message, mine: mine, created_at: iso }; }
     }
 
-    // ---------- render: friends list ----------
+    // ---------- render: inbox ----------
+    function setFolder(folder) {
+        state.folder = folder;
+        document.querySelectorAll('.friends-folder').forEach(function (b) {
+            var active = b.getAttribute('data-folder') === folder;
+            b.classList.toggle('bg-white', active);
+            b.classList.toggle('bg-main-light', !active);
+            b.classList.toggle('text-main-dark', active);
+            b.classList.toggle('text-main-dark/60', !active);
+        });
+        renderFriends();
+    }
     function renderFriends() {
         var list = el('friends-list');
         list.querySelectorAll('[data-friend]').forEach(function (n) { n.remove(); });
 
-        var sorted = state.friends.slice().sort(function (a, b) {
+        var rows = state.friends.slice();
+        if (state.folder === 'online') {
+            rows = rows.filter(function (f) { return state.online[f.id]; });
+        }
+        // Inbox order: unread first, then most recent conversation, then live, then name.
+        rows.sort(function (a, b) {
+            var au = state.unread[a.id] ? 1 : 0, bu = state.unread[b.id] ? 1 : 0;
+            if (au !== bu) return bu - au;
+            var at = a.last_message ? Date.parse(a.last_message.created_at) : 0;
+            var bt = b.last_message ? Date.parse(b.last_message.created_at) : 0;
+            if (at !== bt) return bt - at;
             var ao = state.online[a.id] ? 1 : 0, bo = state.online[b.id] ? 1 : 0;
-            if (ao !== bo) return bo - ao;                 // online first
+            if (ao !== bo) return bo - ao;
             return a.username.localeCompare(b.username);
         });
 
-        el('friends-empty').style.display = sorted.length ? 'none' : 'block';
+        var empty = el('friends-empty');
+        empty.textContent = state.friends.length
+            ? (state.folder === 'online' ? 'No friends are online right now.' : '')
+            : 'No contacts yet. Use “+ Add” to find people.';
+        empty.style.display = rows.length ? 'none' : 'block';
 
-        sorted.forEach(function (f) {
+        rows.forEach(function (f, i) {
             var online = !!state.online[f.id];
             var unread = state.unread[f.id] || 0;
+            var last = f.last_message;
 
             var row = document.createElement('button');
             row.type = 'button';
             row.setAttribute('data-friend', f.id);
-            row.className = 'w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-100 text-left';
+            row.className = 'w-full flex items-start gap-3 px-3 py-2.5 text-left border-b-2 border-main-dark/20 hover:bg-pop/40 ' +
+                (unread ? 'bg-pop/20' : (i % 2 ? 'bg-main-light/60' : 'bg-white'));
 
+            // Avatar with status square.
             var avatarWrap = document.createElement('div');
-            avatarWrap.className = 'relative';
-            var img = document.createElement('img');
-            img.src = f.avatar; img.className = 'w-9 h-9 rounded-full border border-slate-300 object-cover';
-            img.onerror = function () { this.src = '/images/default-avatar.jpg'; };
+            avatarWrap.className = 'relative shrink-0';
+            avatarWrap.appendChild(avatarImg(f.avatar, 'w-9 h-9 border-2 border-main-dark object-cover'));
             var dot = document.createElement('span');
-            dot.className = 'absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ' + (online ? 'bg-green-500' : 'bg-slate-400');
-            avatarWrap.appendChild(img); avatarWrap.appendChild(dot);
+            dot.className = 'absolute -bottom-1 -right-1 w-3.5 h-3.5 border-2 border-main-dark ' + (online ? 'bg-green-500' : 'bg-surface');
+            dot.title = online ? 'online' : 'offline';
+            avatarWrap.appendChild(dot);
 
+            // From / preview.
             var mid = document.createElement('div');
             mid.className = 'flex-1 min-w-0';
-            var name = document.createElement('div');
-            name.className = 'text-sm font-semibold text-main-dark truncate';
+            var top = document.createElement('div');
+            top.className = 'flex items-center gap-2';
+            var name = document.createElement('span');
+            name.className = 'text-sm text-main-dark truncate ' + (unread ? 'font-black' : 'font-bold');
             name.textContent = f.username;
-            var status = document.createElement('div');
-            status.className = 'text-xs ' + (online ? 'text-green-600' : 'text-slate-400');
-            status.textContent = online ? 'online' : 'offline';
-            mid.appendChild(name); mid.appendChild(status);
+            top.appendChild(name);
+            if (online) {
+                var live = document.createElement('span');
+                live.className = 'shrink-0 bg-green-500 text-white border border-main-dark px-1 russo text-[9px] uppercase tracking-wide';
+                live.textContent = 'Live';
+                top.appendChild(live);
+            }
+            var preview = document.createElement('div');
+            preview.className = 'text-xs truncate mt-0.5 ' + (unread ? 'text-main-dark font-bold' : 'text-main-dark/60');
+            preview.textContent = last ? ((last.mine ? 'You: ' : '') + last.message) : 'No messages yet — say hi!';
+            mid.appendChild(top); mid.appendChild(preview);
+
+            // Date + unread count.
+            var right = document.createElement('div');
+            right.className = 'shrink-0 flex flex-col items-end gap-1';
+            var date = document.createElement('span');
+            date.className = 'text-[10px] text-main-dark/60 font-bold';
+            date.textContent = last ? fmtInboxDate(last.created_at) : '';
+            right.appendChild(date);
+            if (unread > 0) {
+                var badge = document.createElement('span');
+                badge.className = 'bg-main-accent text-white border border-main-dark russo text-[10px] px-1.5';
+                badge.textContent = unread;
+                right.appendChild(badge);
+            }
 
             row.appendChild(avatarWrap);
             row.appendChild(mid);
-
-            if (unread > 0) {
-                var badge = document.createElement('span');
-                badge.className = 'bg-rose-600 text-white text-xs font-bold rounded-full px-2 py-0.5';
-                badge.textContent = unread;
-                row.appendChild(badge);
-            }
-
+            row.appendChild(right);
             row.addEventListener('click', function () { openChat(f); });
             list.appendChild(row);
         });
     }
 
-    // ---------- add friend ----------
+    // ---------- add contact ----------
     var searchTimer = null;
     function onSearchInput() {
         clearTimeout(searchTimer);
@@ -232,19 +366,17 @@
         box.innerHTML = '';
         if (!users.length) {
             var none = document.createElement('p');
-            none.className = 'text-xs text-slate-400 py-1'; none.textContent = 'No matches.';
+            none.className = 'text-xs text-main-dark/60 py-1'; none.textContent = 'No matches.';
             box.appendChild(none); return;
         }
         users.forEach(function (u) {
             var row = document.createElement('div');
-            row.className = 'flex items-center gap-2';
-            var img = document.createElement('img');
-            img.src = u.avatar; img.className = 'w-7 h-7 rounded-full border border-slate-300 object-cover';
-            img.onerror = function () { this.src = '/images/default-avatar.jpg'; };
+            row.className = 'flex items-center gap-2 border-2 border-main-dark bg-main-light px-2 py-1';
             var name = document.createElement('span');
-            name.className = 'flex-1 text-sm truncate'; name.textContent = u.username;
+            name.className = 'flex-1 text-sm font-bold text-main-dark truncate'; name.textContent = u.username;
             var btn = document.createElement('button');
-            btn.type = 'button'; btn.className = 'text-xs font-semibold text-white bg-green-600 rounded px-2 py-1 hover:opacity-90';
+            btn.type = 'button';
+            btn.className = 'border-2 border-main-dark bg-green-500 text-white russo text-[10px] uppercase tracking-wide px-2 py-0.5 hover:bg-green-600';
             btn.textContent = 'Add';
             btn.addEventListener('click', function () {
                 jsonFetch('/friends/add', { method: 'POST', body: JSON.stringify({ friend_id: u.id }) }).then(function (res) {
@@ -256,15 +388,17 @@
                     }
                 });
             });
-            row.appendChild(img); row.appendChild(name); row.appendChild(btn);
+            row.appendChild(avatarImg(u.avatar, 'w-7 h-7 border-2 border-main-dark object-cover'));
+            row.appendChild(name); row.appendChild(btn);
             box.appendChild(row);
         });
     }
 
-    // ---------- chat ----------
+    // ---------- thread (message board) ----------
     function showView(which) {
         el('friends-list-view').classList.toggle('hidden', which !== 'list');
         el('friends-chat-view').classList.toggle('hidden', which !== 'chat');
+        el('friends-panel-title').textContent = which === 'chat' ? 'Message Board' : 'Mail';
     }
     function friendById(id) {
         for (var i = 0; i < state.friends.length; i++) { if (state.friends[i].id === id) return state.friends[i]; }
@@ -273,8 +407,9 @@
     function updateChatStatus() {
         var online = !!state.online[state.activeFriendId];
         var s = el('friends-chat-status');
-        s.textContent = online ? 'online' : 'offline';
-        s.className = 'text-xs ' + (online ? 'text-green-400' : 'text-slate-400');
+        s.textContent = online ? 'Live' : 'Offline';
+        s.className = 'ml-auto shrink-0 border-2 border-main-dark px-1.5 py-0.5 russo text-[10px] uppercase tracking-wide ' +
+            (online ? 'bg-green-500 text-white' : 'bg-surface text-main-dark');
     }
     function openChat(friend) {
         state.activeFriendId = friend.id;
@@ -286,27 +421,52 @@
 
         jsonFetch('/friends/' + friend.id + '/messages').then(function (res) {
             if (res && res.success) {
-                (res.data || []).forEach(function (m) { appendMessage(m.mine, m.message, m.created_at); });
+                var msgs = res.data || [];
+                if (!msgs.length) { boardEmpty(friend.username); }
+                msgs.forEach(function (m) { appendMessage(m.mine, m.message, m.created_at); });
                 scrollMessages();
             }
             // Those messages are now read.
             state.unread[friend.id] = 0;
             renderFriends();
-            updateUnreadDot();
+            updateUnreadNote();
         });
         el('friends-chat-input').focus();
     }
+    function boardEmpty(username) {
+        var p = document.createElement('p');
+        p.setAttribute('data-board-empty', '1');
+        p.className = 'text-center text-xs text-main-dark/50 py-6';
+        p.textContent = 'No posts yet. Start the thread with ' + username + '!';
+        el('friends-chat-messages').appendChild(p);
+    }
+    // One board post: header bar (author + date) above the message body.
     function appendMessage(mine, text, iso) {
-        var wrap = document.createElement('div');
-        wrap.className = 'flex flex-col max-w-[80%] ' + (mine ? 'self-end items-end' : 'self-start items-start');
-        var bubble = document.createElement('div');
-        bubble.className = 'rounded-2xl px-3 py-2 text-sm break-words ' +
-            (mine ? 'bg-main-accent text-white rounded-br-sm' : 'bg-slate-200 text-slate-800 rounded-bl-sm');
-        bubble.textContent = text;
-        var time = document.createElement('span');
-        time.className = 'text-[10px] text-slate-400 mt-0.5'; time.textContent = fmtTime(iso);
-        wrap.appendChild(bubble); wrap.appendChild(time);
-        el('friends-chat-messages').appendChild(wrap);
+        var empty = el('friends-chat-messages').querySelector('[data-board-empty]');
+        if (empty) empty.remove();
+
+        var friend = friendById(state.activeFriendId) || {};
+        var post = document.createElement('div');
+        post.className = 'bg-white border-2 border-main-dark shadow-[3px_3px_0_0_#14323B] ' + (mine ? 'ml-6' : 'mr-6');
+
+        var head = document.createElement('div');
+        head.className = 'flex items-center gap-2 px-2 py-1 border-b-2 border-main-dark ' +
+            (mine ? 'bg-brand text-white' : 'bg-main-dark text-white');
+        head.appendChild(avatarImg(mine ? window.avatar : friend.avatar, 'w-5 h-5 border border-white/60 object-cover'));
+        var author = document.createElement('span');
+        author.className = 'russo text-[11px] uppercase tracking-wide truncate';
+        author.textContent = mine ? (window.username || 'You') : (friend.username || 'Friend');
+        var date = document.createElement('span');
+        date.className = 'ml-auto shrink-0 fira-sans text-[10px] opacity-75';
+        date.textContent = fmtPostDate(iso);
+        head.appendChild(author); head.appendChild(date);
+
+        var body = document.createElement('div');
+        body.className = 'px-3 py-2 text-sm text-main-dark whitespace-pre-wrap break-words';
+        body.textContent = text;
+
+        post.appendChild(head); post.appendChild(body);
+        el('friends-chat-messages').appendChild(post);
     }
     function scrollMessages() {
         var m = el('friends-chat-messages'); m.scrollTop = m.scrollHeight;
@@ -322,6 +482,7 @@
             var m = res.data;
             appendMessage(true, m.message, m.created_at);
             scrollMessages();
+            setLastMessage(to, m.message, true, m.created_at);
             // Relay over the socket for instant delivery to the recipient.
             if (socket && socket.connected) {
                 socket.emit('friendsMessage', {
@@ -336,8 +497,9 @@
     function onIncoming(payload) {
         if (!payload || !payload.from_user_id) return;
         var fromId = parseInt(payload.from_user_id, 10);
+        setLastMessage(fromId, payload.message, false, payload.created_at);
 
-        // If I'm already friends and have the chat open, show it live.
+        // Thread already open: show it live.
         if (state.activeFriendId === fromId && state.open) {
             appendMessage(false, payload.message, payload.created_at);
             scrollMessages();
@@ -345,28 +507,35 @@
             jsonFetch('/friends/' + fromId + '/messages');
             return;
         }
-        // Otherwise bump the unread counter + indicator.
+        // Otherwise bump the unread counter + sticky note.
         state.unread[fromId] = (state.unread[fromId] || 0) + 1;
         // A brand-new friend might not be in the list yet — refresh it.
-        if (!friendById(fromId)) { loadFriends(); } else { renderFriends(); updateUnreadDot(); }
+        if (!friendById(fromId)) { loadFriends(); } else { renderFriends(); updateUnreadNote(); }
     }
 
     // ---------- wire up ----------
     function togglePanel(force) {
         state.open = (typeof force === 'boolean') ? force : !state.open;
         el('friends-panel').classList.toggle('hidden', !state.open);
-        if (state.open) { showView('list'); loadFriends(); }
+        el('friends-toggle').setAttribute('aria-expanded', state.open ? 'true' : 'false');
+        if (state.open) { state.activeFriendId = null; showView('list'); loadFriends(); }
     }
 
     el('friends-toggle').addEventListener('click', function () { togglePanel(); });
+    el('friends-close').addEventListener('click', function () { togglePanel(false); });
+    document.querySelectorAll('.friends-folder').forEach(function (b) {
+        b.addEventListener('click', function () { setFolder(b.getAttribute('data-folder')); });
+    });
     el('friends-add-toggle').addEventListener('click', function () {
         var box = el('friends-add-box'); box.classList.toggle('hidden');
         if (!box.classList.contains('hidden')) el('friends-search-input').focus();
     });
     el('friends-search-input').addEventListener('input', onSearchInput);
-    el('friends-chat-back').addEventListener('click', function () { state.activeFriendId = null; showView('list'); });
+    el('friends-chat-back').addEventListener('click', function () { state.activeFriendId = null; showView('list'); renderFriends(); });
     el('friends-chat-send').addEventListener('click', sendMessage);
-    el('friends-chat-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } });
+    el('friends-chat-input').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
 
     // A friend just came online — show a toast and reflect their status live.
     function onFriendLive(data) {
@@ -382,8 +551,9 @@
         socket.on('connect', function () { refreshPresence(); loadFriends().then(announceMe); });
     }
 
-    // Prime unread/presence on load (panel closed) so the indicator is accurate,
+    // Prime unread/presence on load (panel closed) so the envelope is accurate,
     // then announce myself so already-online friends are notified I went live.
+    setFolder('inbox');
     loadFriends().then(announceMe);
     setInterval(refreshPresence, 15000);
     setInterval(loadUnread, 30000);
