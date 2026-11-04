@@ -51,6 +51,7 @@
                 window.avatar = @if(is_null(Auth::user()->avatar)) '/images/default-avatar.jpg' @else '{!! Auth::user()->avatar !!}' @endif;
                 window.playerType = 'player';
                 window.iconFlair = @if(!is_null(Auth::user()->icon_flair_id)) '{!! Auth::user()->iconFlair->icon_url !!}' @else '' @endif;
+                window.border = @if(!is_null(Auth::user()->border_id) && Auth::user()->border) '{!! Auth::user()->border->color !!}' @else '' @endif;
             @else
                 window.username = @if(session('tmp-user-username')) '{{ session('tmp-user-username') }}' @else  'guest' @endif;
                 window.id = @if(session('tmp-user-id')) '{{ session('tmp-user-id') }}' @else 0 @endif;
@@ -58,6 +59,7 @@
                 window.avatar = '/images/default-avatar.jpg';
                 window.playerType = 'guest';
                 window.iconFlair = '';
+                window.border = '';
             @endif
         </script>
     </head>

@@ -20,4 +20,8 @@ class User extends Model
         public function iconFlair() {
             return $this->hasOne(IconFlairs::class, 'id', 'icon_flair_id');
         }
+
+        public function border() {
+            return $this->hasOne(Borders::class, 'id', 'border_id');
+        }
 }

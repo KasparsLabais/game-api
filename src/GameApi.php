@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use PartyGames\GameApi\Models\Game;
 use PartyGames\GameApi\Models\GameInstances;
 use PartyGames\GameApi\Models\IconFlairs;
+use PartyGames\GameApi\Models\Borders;
 use PartyGames\GameApi\Models\PlayerInstances;
 use PartyGames\GameApi\Models\TmpUsers;
 use PartyGames\GameApi\Models\User;
@@ -667,6 +668,70 @@ class GameApi
         return GameCurrency::where('user_id', Auth::user()->id)->sum('amount');
     }
 
+    /** The current user's most recent coin ledger entries (for the profile). */
+    public static function getUsersRecentCurrency($limit = 8)
+    {
+        return GameCurrency::where('user_id', Auth::user()->id)
+            ->orderBy('id', 'desc')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
+     * Split a coin prize pot across the podium (50% / 30% / 20%).
+     * Returns an array of up to three whole-coin amounts, largest first.
+     */
+    public static function coinPotShares($pot): array
+    {
+        $pot = (int) $pot;
+        if ($pot <= 0) {
+            return [];
+        }
+
+        $shares = [];
+        foreach ([0.5, 0.3, 0.2] as $fraction) {
+            $amount = (int) round($pot * $fraction);
+            if ($amount > 0) {
+                $shares[] = $amount;
+            }
+        }
+
+        return $shares;
+    }
+
+    /**
+     * Pay a one-off coin bonus to a registered user, keyed to a source
+     * (e.g. a season or event win) so it can never be awarded twice.
+     * Returns true when a new ledger entry was written.
+     */
+    public static function awardCoins($userId, $amount, $type, $referenceId, $referenceType, $note = ''): bool
+    {
+        $amount = (int) $amount;
+        if (!$userId || $amount <= 0) {
+            return false;
+        }
+
+        $already = GameCurrency::where('user_id', $userId)
+            ->where('reference_id', $referenceId)
+            ->where('reference_type', $referenceType)
+            ->exists();
+        if ($already) {
+            return false;
+        }
+
+        GameCurrency::create([
+            'type'             => $type,
+            'amount'           => $amount,
+            'user_id'          => $userId,
+            'game_instance_id' => 0,
+            'reference_id'     => $referenceId,
+            'reference_type'   => $referenceType,
+            'note'             => $note,
+        ]);
+
+        return true;
+    }
+
     public static function createTmpUser($username)
     {
         $tmpUser = TmpUsers::create([
@@ -705,6 +770,37 @@ class GameApi
     {
         User::where('id', Auth::user()->id)->update([
             'icon_flair_id' => $flairId,
+        ]);
+
+        return true;
+    }
+
+    public static function getUsersBorder($userId = null)
+    {
+        if (is_null($userId) && !Auth::check()) {
+            return null;
+        }
+
+        if (is_null($userId) && Auth::check()) {
+            $borderId = Auth::user()->border_id;
+        } else {
+            $user = User::where('id', $userId)->first();
+            $borderId = $user ? $user->border_id : null;
+        }
+
+        return Borders::where('id', $borderId)->first();
+    }
+
+    public static function getAvailableBorders()
+    {
+        return Borders::where('is_active', true)->get();
+    }
+
+    public static function changeBorder($borderId)
+    {
+        // Allow clearing the border (empty / 0 removes it).
+        User::where('id', Auth::user()->id)->update([
+            'border_id' => $borderId ?: null,
         ]);
 
         return true;

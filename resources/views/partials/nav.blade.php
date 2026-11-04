@@ -66,8 +66,37 @@
         </div>
         <div class="hidden md:flex items-center gap-1">
             <a href="/" class="fira-sans font-bold uppercase text-sm tracking-wide text-white px-3 py-2 hover:bg-main-dark/20 transition-colors">Home</a>
-            <a href="/trivia" class="fira-sans font-bold uppercase text-sm tracking-wide text-white px-3 py-2 hover:bg-main-dark/20 transition-colors">Play</a>
+            {{-- Play dropdown: pick which game to browse --}}
+            <div class="relative group">
+                <button type="button" class="flex items-center gap-1.5 fira-sans font-bold uppercase text-sm tracking-wide text-white px-3 py-2 hover:bg-main-dark/20 transition-colors">
+                    Play
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 transition-transform duration-150 group-hover:rotate-180"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" /></svg>
+                </button>
+                {{-- pt-2 is a hover bridge so the menu doesn't close on the gap --}}
+                <div class="absolute left-0 top-full w-52 pt-2 z-50 origin-top transition-all duration-150 opacity-0 -translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto">
+                    <div class="bg-white border-4 border-main-dark shadow-[6px_6px_0_0_#14323B] p-2 flex flex-col gap-2">
+                        <a href="/trivia" class="flex items-center gap-3 px-3 py-2 fira-sans font-bold text-main-dark border-4 border-transparent transition-all duration-100 hover:border-main-dark hover:bg-brand hover:text-white hover:shadow-[3px_3px_0_0_#14323B]">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5 shrink-0" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.4" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.4" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.4" fill="currentColor"/></svg>
+                            Trivia
+                        </a>
+                        <a href="/battleship" class="flex items-center gap-3 px-3 py-2 fira-sans font-bold text-main-dark border-4 border-transparent transition-all duration-100 hover:border-main-dark hover:bg-main-dark hover:text-white hover:shadow-[3px_3px_0_0_#14323B]">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 shrink-0" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.5h18l-1.8 4.5a2 2 0 0 1-1.86 1.26H6.66A2 2 0 0 1 4.8 18L3 13.5Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 13.5V6m0 0 3.5 2M12 6 8.5 8M6.5 13.5v-3h11v3"/></svg>
+                            Battleships
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        {{-- Admin panel — only for users who can access it. --}}
+        @if(Auth::check() && method_exists(Auth::user(), 'hasPermission') && Auth::user()->hasPermission('admin.access'))
+            <a href="/admin/dashboard" class="hidden md:inline-flex items-center gap-1.5 fira-sans font-black uppercase text-sm tracking-wide bg-main-dark text-white border-4 border-main-dark shadow-[3px_3px_0_0_#14323B] px-3 py-2 transition-all duration-100 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#14323B] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[0px_0px_0_0_#14323B]">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" class="w-4 h-4 stroke-current shrink-0">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                </svg>
+                Admin
+            </a>
+        @endif
 
         @auth
             {{-- Avatar with slide-down dropdown --}}
@@ -83,6 +112,24 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                         </svg>
                         Profile
+                    </a>
+                    <a href="/trv/management" class="flex items-center gap-3 px-3 py-2 fira-sans font-bold text-main-dark border-4 border-transparent transition-all duration-100 hover:border-main-dark hover:bg-brand hover:text-white hover:shadow-[3px_3px_0_0_#14323B]">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" class="w-5 h-5 stroke-current shrink-0">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                        </svg>
+                        My Trivias
+                    </a>
+                    <a href="/trv/seasons" class="flex items-center gap-3 px-3 py-2 fira-sans font-bold text-main-dark border-4 border-transparent transition-all duration-100 hover:border-main-dark hover:bg-pop hover:shadow-[3px_3px_0_0_#14323B]">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" class="w-5 h-5 stroke-main-dark shrink-0">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0" />
+                        </svg>
+                        Seasons
+                    </a>
+                    <a href="/trv/events" class="flex items-center gap-3 px-3 py-2 fira-sans font-bold text-main-dark border-4 border-transparent transition-all duration-100 hover:border-main-dark hover:bg-main-accent hover:text-white hover:shadow-[3px_3px_0_0_#14323B]">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" class="w-5 h-5 stroke-current shrink-0">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.25-13.5h16.5a1.5 1.5 0 0 1 1.5 1.5v1.5a1.5 1.5 0 0 1-1.5 1.5H3.75a1.5 1.5 0 0 1-1.5-1.5V9a1.5 1.5 0 0 1 1.5-1.5Z" />
+                        </svg>
+                        Events
                     </a>
                     <a href="/logout" class="flex items-center gap-3 px-3 py-2 fira-sans font-bold text-main-dark border-4 border-transparent transition-all duration-100 hover:border-main-dark hover:bg-main-accent hover:text-white hover:shadow-[3px_3px_0_0_#14323B]">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" class="w-5 h-5 stroke-current shrink-0">
@@ -115,9 +162,17 @@
     </div>
     <div class="flex flex-col p-4 gap-3">
         <a href="/" class="fira-sans font-bold text-main-dark border-4 border-main-dark px-4 py-3 shadow-[3px_3px_0_0_#14323B] bg-white">Home</a>
-        <a href="/trivia" class="fira-sans font-bold text-main-dark border-4 border-main-dark px-4 py-3 shadow-[3px_3px_0_0_#14323B] bg-white">Play Trivia</a>
+        <span class="fira-sans text-[10px] uppercase tracking-widest text-main-dark/40 px-1 pt-1">Play</span>
+        <a href="/trivia" class="fira-sans font-bold text-main-dark border-4 border-main-dark px-4 py-3 shadow-[3px_3px_0_0_#14323B] bg-white">Trivia</a>
+        <a href="/battleship" class="fira-sans font-bold text-white border-4 border-main-dark px-4 py-3 shadow-[3px_3px_0_0_#14323B] bg-main-dark">Battleships</a>
         @auth
             <a href="/profile" class="fira-sans font-bold text-main-dark border-4 border-main-dark px-4 py-3 shadow-[3px_3px_0_0_#14323B] bg-pop">Profile</a>
+            <a href="/trv/management" class="fira-sans font-bold text-white border-4 border-main-dark px-4 py-3 shadow-[3px_3px_0_0_#14323B] bg-brand">My Trivias</a>
+            <a href="/trv/seasons" class="fira-sans font-bold text-main-dark border-4 border-main-dark px-4 py-3 shadow-[3px_3px_0_0_#14323B] bg-pop">Seasons</a>
+            <a href="/trv/events" class="fira-sans font-bold text-white border-4 border-main-dark px-4 py-3 shadow-[3px_3px_0_0_#14323B] bg-main-accent">Events</a>
+            @if(method_exists(Auth::user(), 'hasPermission') && Auth::user()->hasPermission('admin.access'))
+                <a href="/admin/dashboard" class="fira-sans font-bold text-white border-4 border-main-dark px-4 py-3 shadow-[3px_3px_0_0_#14323B] bg-main-dark">Admin Panel</a>
+            @endif
             <a href="/logout" class="fira-sans font-bold text-white border-4 border-main-dark px-4 py-3 shadow-[3px_3px_0_0_#14323B] bg-main-accent">Logout</a>
         @else
             <a href="/login" class="fira-sans font-bold text-white border-4 border-main-dark px-4 py-3 shadow-[3px_3px_0_0_#14323B] bg-main-accent">Login</a>
