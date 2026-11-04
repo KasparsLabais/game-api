@@ -325,7 +325,7 @@
             var preview = document.createElement('div');
             preview.className = 'text-xs truncate mt-0.5 ' + (unread ? 'text-main-dark font-bold' : 'text-main-dark/60');
             preview.textContent = last
-                ? ((last.mine ? 'You: ' : '') + (battleCode(last.message) ? '⚔️ Trivia Battle invite' : last.message))
+                ? ((last.mine ? 'You: ' : '') + (gameInvite(last.message) ? gameInvite(last.message).type.title : last.message))
                 : 'No messages yet — say hi!';
             mid.appendChild(top); mid.appendChild(preview);
 
@@ -443,27 +443,36 @@
         el('friends-chat-messages').appendChild(p);
     }
     // One board post: header bar (author + date) above the message body.
-    // Trivia Battle invites are plain messages carrying a /trivia/battle/CODE link.
-    // Only the code is taken from the text; the Join link is always built locally.
-    function battleCode(text) {
-        var m = /\/trivia\/battle\/([A-Z0-9]{8})\b/.exec(text || '');
-        return m ? m[1] : null;
+    // Game invites are plain messages carrying a join link: Trivia Battles
+    // (/trivia/battle/CODE) and Battleship matches (/btl/match/CODE). Only the
+    // code is taken from the text; the Join link is always built locally.
+    var INVITES = [
+        { re: /\/trivia\/battle\/([A-Z0-9]{8})\b/, path: '/trivia/battle/', title: '⚔️ Trivia Battle invite', blurb: 'Same questions, same clock — no game master.', join: 'Join battle' },
+        { re: /\/btl\/match\/([A-Z0-9]{8})\b/, path: '/btl/match/', title: '⚓ Battleship challenge', blurb: 'Your fleet against theirs — first to sink the other wins.', join: 'Join match' },
+    ];
+    function gameInvite(text) {
+        for (var i = 0; i < INVITES.length; i++) {
+            var m = INVITES[i].re.exec(text || '');
+            if (m) return { type: INVITES[i], code: m[1] };
+        }
+        return null;
     }
-    function battleCard(code, mine) {
+    function battleCard(invite, mine) {
+        var t = invite.type, code = invite.code;
         var card = document.createElement('div');
         card.className = 'mx-3 mb-3 border-2 border-main-dark bg-pop shadow-[3px_3px_0_0_#14323B]';
         var title = document.createElement('div');
         title.className = 'px-2 py-1 border-b-2 border-main-dark russo text-[11px] uppercase tracking-widest text-main-dark';
-        title.textContent = '⚔️ Trivia Battle invite';
+        title.textContent = t.title;
         var row = document.createElement('div');
         row.className = 'flex items-center gap-2 px-2 py-2';
         var note = document.createElement('span');
         note.className = 'flex-1 fira-sans text-xs text-main-dark';
-        note.textContent = mine ? 'You sent a battle invite.' : 'Same questions, same clock — no game master.';
+        note.textContent = mine ? 'You sent this invite.' : t.blurb;
         var join = document.createElement('a');
-        join.href = '/trivia/battle/' + code;
+        join.href = t.path + code;
         join.className = 'shrink-0 bg-main-accent text-white border-2 border-main-dark px-3 py-1 russo text-[11px] uppercase tracking-wide hover:-translate-y-0.5 transition-transform';
-        join.textContent = mine ? 'Open' : 'Join battle';
+        join.textContent = mine ? 'Open' : t.join;
         row.appendChild(note); row.appendChild(join);
         card.appendChild(title); card.appendChild(row);
         return card;
@@ -494,8 +503,8 @@
         body.textContent = text;
 
         post.appendChild(head); post.appendChild(body);
-        var code = battleCode(text);
-        if (code) post.appendChild(battleCard(code, mine));
+        var invite = gameInvite(text);
+        if (invite) post.appendChild(battleCard(invite, mine));
         el('friends-chat-messages').appendChild(post);
     }
     function scrollMessages() {
